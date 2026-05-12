@@ -239,7 +239,7 @@
     }
     .rec-card .rec-question { font-weight: 700; color: var(--white); font-size: 14px; }
     .rec-card .rec-answer { font-size: 13px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .rec-card .rec-actions { margin-top: 8px; }
+    .rec-card .rec-actions { margin-top: 8px; display: flex; gap: 8px; align-items: center; }
     .btn-add-rec {
       background: rgba(79,142,247,0.15);
       color: var(--accent);
@@ -249,9 +249,22 @@
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.15s, color 0.15s;
     }
     .btn-add-rec:hover { background: rgba(79,142,247,0.25); }
+    .btn-add-rec:disabled { opacity: 0.6; cursor: default; }
+    .btn-edit-rec {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-edit-rec:hover { border-color: var(--text-muted); color: var(--text); }
 
     /* ── Modal ───────────────────────────────────────────────────── */
     .modal-overlay {
@@ -628,12 +641,13 @@
         }
 
         const cards = data.recommendations.map((r, i) => `
-          <div class="rec-card">
+          <div class="rec-card" id="rec-card-${i}">
             <span class="category-tag">${esc(r.category || 'General')}</span>
             <div class="rec-question">${esc(r.question)}</div>
             <div class="rec-answer">${esc(r.answer)}</div>
             <div class="rec-actions">
-              <button class="btn-add-rec" onclick="addRecommendationToKB(${i})">+ Add to Knowledge Base</button>
+              <button class="btn-edit-rec" onclick="editRecommendation(${i})">Edit</button>
+              <button class="btn-add-rec" id="rec-add-${i}" onclick="directAddRecommendation(${i})">+ Add to Knowledge Base</button>
             </div>
           </div>`).join('');
 
@@ -654,15 +668,49 @@
       }
     }
 
-    function addRecommendationToKB(index) {
+    // Edit button — opens the modal pre-filled so you can tweak before saving
+    function editRecommendation(index) {
       const rec = (window._currentRecommendations || [])[index];
       if (!rec) return;
       editingId = null;
-      document.getElementById('modal-title').textContent = 'Add recommended entry';
+      document.getElementById('modal-title').textContent = 'Edit & add recommended entry';
       document.getElementById('field-category').value = rec.category || '';
       document.getElementById('field-question').value = rec.question;
       document.getElementById('field-answer').value = rec.answer;
       document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    // Add to KB button — direct one-click add, no modal
+    async function directAddRecommendation(index) {
+      const rec = (window._currentRecommendations || [])[index];
+      if (!rec) return;
+      const btn = document.getElementById(`rec-add-${index}`);
+      btn.disabled = true;
+      btn.textContent = 'Adding…';
+      try {
+        const res = await fetch('/api/kb', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            site_id: currentSite,
+            category: rec.category || '',
+            question: rec.question,
+            answer: rec.answer
+          })
+        });
+        if (!res.ok) throw new Error('Failed');
+        btn.textContent = '✓ Added';
+        btn.style.color = 'var(--green)';
+        // Also mark the edit button as done
+        const card = document.getElementById(`rec-card-${index}`);
+        const editBtn = card ? card.querySelector('.btn-edit-rec') : null;
+        if (editBtn) { editBtn.disabled = true; editBtn.style.opacity = '0.4'; }
+        // Refresh KB count if on KB tab later
+        await loadEntries();
+      } catch {
+        btn.disabled = false;
+        btn.textContent = '+ Add to Knowledge Base';
+      }
     }
 
     function formatDate(iso) {
