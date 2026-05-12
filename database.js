@@ -26,6 +26,17 @@ function seedDatabase() {
     )
   `);
 
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS chat_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      site_id TEXT NOT NULL,
+      session_id TEXT DEFAULT '',
+      user_message TEXT NOT NULL,
+      bot_response TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   const count = database.prepare('SELECT COUNT(*) as count FROM knowledge_base').get();
   if (count.count > 0) return;
 

@@ -156,6 +156,8 @@ ${kbText}`;
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
 
+  let fullBotResponse = '';
+
   try {
     const stream = anthropic.messages.stream({
       model: process.env.MODEL || 'claude-haiku-4-5-20251001',
@@ -166,8 +168,19 @@ ${kbText}`;
 
     for await (const chunk of stream) {
       if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+        fullBotResponse += chunk.delta.text;
         res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
       }
+    }
+
+    // Log the conversation (non-fatal)
+    try {
+      const userMessage = Array.isArray(messages) ? (messages[messages.length - 1]?.content || '') : '';
+      getDb().prepare(
+        'INSERT INTO chat_logs (site_id, session_id, user_message, bot_response) VALUES (?, ?, ?, ?)'
+      ).run(siteId, req.session?.id || '', userMessage, fullBotResponse);
+    } catch (logErr) {
+      console.error('Chat log error:', logErr.message);
     }
 
     res.write('data: [DONE]\n\n');
@@ -220,6 +233,71 @@ app.delete('/api/kb/:id', requireAuth, (req, res) => {
   const db = getDb();
   db.prepare('DELETE FROM knowledge_base WHERE id = ?').run(req.params.id);
   res.json({ success: true });
+});
+
+// Chat logs — GET
+app.get('/api/logs/:siteId', requireAuth, (req, res) => {
+  const db = getDb();
+  const logs = db
+    .prepare('SELECT id, site_id, user_message, bot_response, created_at FROM chat_logs WHERE site_id = ? ORDER BY created_at DESC LIMIT 100')
+    .all(req.params.siteId);
+  res.json(logs);
+});
+
+// Recommendations — GET
+app.get('/api/recommendations/:siteId', requireAuth, async (req, res) => {
+  const db = getDb();
+  const logs = db
+    .prepare('SELECT user_message, bot_response FROM chat_logs WHERE site_id = ? ORDER BY created_at DESC LIMIT 50')
+    .all(req.params.siteId);
+
+  if (logs.length === 0) {
+    return res.json({ recommendations: [], message: 'No chat history yet. Recommendations appear once users have started chatting.' });
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY is not set.' });
+  }
+
+  const kb = db
+    .prepare('SELECT question FROM knowledge_base WHERE site_id = ?')
+    .all(req.params.siteId);
+
+  const logsText = logs.map(l => `User: ${l.user_message}\nBot: ${l.bot_response}`).join('\n---\n');
+  const kbText = kb.map(e => `- ${e.question}`).join('\n');
+
+  try {
+    const response = await anthropic.messages.create({
+      model: process.env.MODEL || 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: `You are a knowledge base improvement assistant. Analyse these recent chat conversations and suggest new knowledge base entries that would help the bot answer users better.
+
+EXISTING KNOWLEDGE BASE QUESTIONS (do not suggest duplicates):
+${kbText || '(none yet)'}
+
+RECENT CONVERSATIONS:
+${logsText}
+
+Return a JSON array of 3–6 suggested new entries. Each must have: category (string), question (string), answer (string).
+Only suggest entries NOT already in the existing knowledge base.
+Return ONLY valid JSON array, no other text. Example format:
+[{"category":"Delivery","question":"Can I change my delivery address?","answer":"Yes, you can update your delivery address..."}]`
+      }]
+    });
+
+    let recommendations = [];
+    try {
+      recommendations = JSON.parse(response.content[0].text.trim());
+    } catch (_) {
+      recommendations = [];
+    }
+    res.json({ recommendations });
+  } catch (err) {
+    console.error('Recommendations error:', err.message);
+    res.status(500).json({ error: 'Failed to generate recommendations. Please try again.' });
+  }
 });
 
 // Sites list

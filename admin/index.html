@@ -106,6 +106,29 @@
     }
     .add-btn:hover { background: var(--accent-hover); }
 
+    /* ── Tab bar ─────────────────────────────────────────────────── */
+    .tab-bar {
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
     /* ── Stats row ───────────────────────────────────────────────── */
     .stats-row {
       display: flex;
@@ -175,6 +198,60 @@
     .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
     .empty-state h3 { color: var(--text); margin-bottom: 8px; }
     .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+
+    /* ── History ─────────────────────────────────────────────────── */
+    .log-list { display: flex; flex-direction: column; gap: 12px; }
+    .log-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+    .log-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+    .log-user { font-weight: 600; color: var(--white); margin-bottom: 4px; font-size: 14px; }
+    .log-bot { font-size: 13px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* ── Recommendations ─────────────────────────────────────────── */
+    .rec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .rec-header p { font-size: 13px; color: var(--text-muted); }
+    .generate-btn {
+      background: var(--accent);
+      color: var(--white);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .generate-btn:hover { background: var(--accent-hover); }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .rec-list { display: flex; flex-direction: column; gap: 12px; }
+    .rec-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rec-card .rec-question { font-weight: 700; color: var(--white); font-size: 14px; }
+    .rec-card .rec-answer { font-size: 13px; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .rec-card .rec-actions { margin-top: 8px; }
+    .btn-add-rec {
+      background: rgba(79,142,247,0.15);
+      color: var(--accent);
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-add-rec:hover { background: rgba(79,142,247,0.25); }
 
     /* ── Modal ───────────────────────────────────────────────────── */
     .modal-overlay {
@@ -266,6 +343,12 @@
       </button>
     </div>
 
+    <div class="tab-bar" id="tab-bar" style="display:none">
+      <button class="tab-btn active" id="tab-kb" onclick="switchTab('kb')">Knowledge Base</button>
+      <button class="tab-btn" id="tab-history" onclick="switchTab('history')">History</button>
+      <button class="tab-btn" id="tab-recommendations" onclick="switchTab('recommendations')">Recommendations</button>
+    </div>
+
     <div class="stats-row" id="stats-row" style="display:none">
       <div class="stat-card"><div class="val" id="stat-total">—</div><div class="lbl">Total entries</div></div>
       <div class="stat-card"><div class="val" id="stat-cats">—</div><div class="lbl">Categories</div></div>
@@ -318,6 +401,7 @@
     let entries = [];
     let editingId = null;
     let siteCounts = {};
+    let currentTab = 'kb';
 
     // ── Init ──────────────────────────────────────────────────────────
     async function init() {
@@ -351,15 +435,25 @@
     // ── Load site ─────────────────────────────────────────────────────
     async function loadSite(siteId, siteName) {
       currentSite = siteId;
+      currentTab = 'kb';
+      window._currentRecommendations = [];
 
       document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`[data-id="${siteId}"]`).classList.add('active');
 
       document.getElementById('site-name').textContent = `${siteIcon(siteId)} ${siteName}`;
       document.getElementById('site-subtitle').textContent = `Managing knowledge base entries for ${siteName}`;
+
+      // Show and reset the tab bar to KB
+      document.getElementById('tab-bar').style.display = 'flex';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-kb').classList.add('active');
+
+      // Show KB-specific UI
       document.getElementById('add-btn').style.display = 'flex';
       document.getElementById('stats-row').style.display = 'flex';
       document.getElementById('table-header').style.display = 'flex';
+      document.getElementById('filter-input').value = '';
 
       document.getElementById('table-container').innerHTML = '<div class="loading">Loading entries…</div>';
 
@@ -368,6 +462,28 @@
 
       renderTable(entries);
       updateStats(entries);
+    }
+
+    // ── Tab switching ─────────────────────────────────────────────────
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+
+      const addBtn = document.getElementById('add-btn');
+      const statsRow = document.getElementById('stats-row');
+      addBtn.style.display = tab === 'kb' ? 'flex' : 'none';
+      statsRow.style.display = tab === 'kb' ? 'flex' : 'none';
+
+      if (tab === 'kb') renderTableView();
+      else if (tab === 'history') loadHistory();
+      else if (tab === 'recommendations') renderRecommendationsView();
+    }
+
+    function renderTableView() {
+      document.getElementById('table-header').style.display = 'flex';
+      document.getElementById('filter-input').value = '';
+      renderTable(entries);
     }
 
     // ── Render table ──────────────────────────────────────────────────
@@ -415,6 +531,7 @@
 
     // ── Filter ────────────────────────────────────────────────────────
     document.getElementById('filter-input').addEventListener('input', e => {
+      if (currentTab !== 'kb') return;
       const q = e.target.value.toLowerCase();
       const filtered = entries.filter(en =>
         en.question.toLowerCase().includes(q) ||
@@ -423,6 +540,121 @@
       );
       renderTable(filtered);
     });
+
+    // ── History tab ───────────────────────────────────────────────────
+    async function loadHistory() {
+      document.getElementById('table-header').style.display = 'none';
+      document.getElementById('table-container').innerHTML = '<div class="loading">Loading history…</div>';
+
+      try {
+        const res = await fetch(`/api/logs/${currentSite}`);
+        const logs = await res.json();
+
+        if (!logs.length) {
+          document.getElementById('table-container').innerHTML = `
+            <div class="empty-state">
+              <div class="icon">💬</div>
+              <h3>No conversations yet</h3>
+              <p>Once users start chatting, their messages will appear here.</p>
+            </div>`;
+          return;
+        }
+
+        const items = logs.map(l => `
+          <div class="log-card">
+            <div class="log-meta">${formatDate(l.created_at)}</div>
+            <div class="log-user">👤 ${esc(l.user_message)}</div>
+            <div class="log-bot">🤖 ${esc(l.bot_response)}</div>
+          </div>`).join('');
+
+        document.getElementById('table-container').innerHTML = `<div class="log-list">${items}</div>`;
+      } catch (err) {
+        document.getElementById('table-container').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">⚠️</div>
+            <h3>Something went wrong</h3>
+            <p>Could not load chat history. Please try again.</p>
+          </div>`;
+      }
+    }
+
+    // ── Recommendations tab ───────────────────────────────────────────
+    function renderRecommendationsView() {
+      document.getElementById('table-header').style.display = 'none';
+      document.getElementById('table-container').innerHTML = `
+        <div class="rec-header">
+          <p>Generate suggested knowledge base entries based on what users have been asking.</p>
+          <button class="generate-btn" id="generate-btn" onclick="generateRecommendations()">Generate Recommendations</button>
+        </div>
+        <div id="rec-container"></div>`;
+    }
+
+    async function generateRecommendations() {
+      const btn = document.getElementById('generate-btn');
+      btn.disabled = true;
+      btn.textContent = 'Analysing…';
+      document.getElementById('rec-container').innerHTML = '<div class="loading">Analysing chat history…</div>';
+
+      try {
+        const res = await fetch(`/api/recommendations/${currentSite}`);
+        const data = await res.json();
+
+        if (data.message || !data.recommendations || data.recommendations.length === 0) {
+          document.getElementById('rec-container').innerHTML = `
+            <div class="empty-state">
+              <div class="icon">💡</div>
+              <h3>No recommendations yet</h3>
+              <p>${esc(data.message || 'Start chatting to generate recommendations.')}</p>
+            </div>`;
+          return;
+        }
+
+        const cards = data.recommendations.map((r, i) => `
+          <div class="rec-card">
+            <span class="category-tag">${esc(r.category || 'General')}</span>
+            <div class="rec-question">${esc(r.question)}</div>
+            <div class="rec-answer">${esc(r.answer)}</div>
+            <div class="rec-actions">
+              <button class="btn-add-rec" onclick="addRecommendationToKB(${i})">+ Add to Knowledge Base</button>
+            </div>
+          </div>`).join('');
+
+        document.getElementById('rec-container').innerHTML = `<div class="rec-list">${cards}</div>`;
+        window._currentRecommendations = data.recommendations;
+      } catch (err) {
+        document.getElementById('rec-container').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">⚠️</div>
+            <h3>Something went wrong</h3>
+            <p>Please try again.</p>
+          </div>`;
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Regenerate';
+        }
+      }
+    }
+
+    function addRecommendationToKB(index) {
+      const rec = (window._currentRecommendations || [])[index];
+      if (!rec) return;
+      editingId = null;
+      document.getElementById('modal-title').textContent = 'Add recommended entry';
+      document.getElementById('field-category').value = rec.category || '';
+      document.getElementById('field-question').value = rec.question;
+      document.getElementById('field-answer').value = rec.answer;
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    function formatDate(iso) {
+      try {
+        return new Date(iso).toLocaleString('en-GB', {
+          day: 'numeric', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      } catch (_) { return iso; }
+    }
 
     // ── Modal: add ────────────────────────────────────────────────────
     function openModal() {
@@ -484,8 +716,18 @@
           showToast('Entry added.');
         }
         closeModal();
-        await loadSite(currentSite, document.getElementById('site-name').textContent.slice(3));
+        // Reload KB data and switch back to the KB tab
+        const siteName = document.getElementById('site-name').textContent.slice(3);
+        const res = await fetch(`/api/kb/${currentSite}`);
+        entries = await res.json();
+        updateStats(entries);
         await fetchCount(currentSite);
+        // If we're currently on the KB tab, re-render; otherwise switch to it
+        if (currentTab === 'kb') {
+          renderTableView();
+        } else {
+          switchTab('kb');
+        }
       } catch (err) {
         showToast('Failed to save. Please try again.', true);
       }
@@ -496,8 +738,11 @@
       if (!confirm('Delete this entry? This cannot be undone.')) return;
       await fetch(`/api/kb/${id}`, { method: 'DELETE' });
       showToast('Entry deleted.');
-      await loadSite(currentSite, document.getElementById('site-name').textContent.slice(3));
+      const res = await fetch(`/api/kb/${currentSite}`);
+      entries = await res.json();
+      updateStats(entries);
       await fetchCount(currentSite);
+      renderTableView();
     }
 
     // ── Toast ─────────────────────────────────────────────────────────

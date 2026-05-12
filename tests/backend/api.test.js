@@ -11,9 +11,25 @@
 // ── Database mock — declared before any require() that loads server.js ────────
 
 let mockEntries = [];
+let mockChatLogs = [];
 let nextId = 100;
 
 function makeMockStatement(sql) {
+  if (sql.includes('chat_logs')) {
+    return {
+      all: jest.fn((siteId) => mockChatLogs.filter(l => l.site_id === siteId)),
+      get: jest.fn(() => null),
+      run: jest.fn((...args) => {
+        if (sql.includes('INSERT')) {
+          const id = ++nextId;
+          const [site_id, session_id, user_message, bot_response] = args;
+          mockChatLogs.push({ id, site_id, session_id: session_id || '', user_message, bot_response, created_at: new Date().toISOString() });
+          return { lastInsertRowid: id };
+        }
+        return { changes: 0 };
+      })
+    };
+  }
   return {
     all: jest.fn((siteId) =>
       mockEntries.filter(e => e.site_id === siteId)
@@ -63,6 +79,7 @@ beforeEach(() => {
     { id: 3, site_id: 'retail', category: 'Delivery',        question: 'Delivery time?',    answer: '3–5 working days.',                     created_at: '2025-01-01' },
     { id: 4, site_id: 'gov',    category: 'Council Tax',     question: 'How do I pay?',     answer: 'Online, phone, or post office.',         created_at: '2025-01-01' }
   ];
+  mockChatLogs = [];
   nextId = 100;
   mockDb.prepare.mockImplementation((sql) => makeMockStatement(sql));
 });
@@ -311,5 +328,46 @@ describe('POST /api/chat — input validation', () => {
       .send({ siteId: 'legal', messages: [{ role: 'user', content: 'Hello' }] });
     expect(res.status).toBe(500);
     if (key) process.env.ANTHROPIC_API_KEY = key;
+  });
+});
+
+// ── Chat logs ─────────────────────────────────────────────────────────────────
+describe('GET /api/logs/:siteId', () => {
+  test('returns 200 with an array for a known site', async () => {
+    const res = await request(app).get('/api/logs/legal');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  test('returns 200 with empty array for a site with no logs', async () => {
+    const res = await request(app).get('/api/logs/unknown');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
+  });
+});
+
+// ── Recommendations ───────────────────────────────────────────────────────────
+describe('GET /api/recommendations/:siteId', () => {
+  test('returns 200 with empty recommendations when no chat history exists', async () => {
+    const res = await request(app).get('/api/recommendations/legal');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('recommendations');
+    expect(Array.isArray(res.body.recommendations)).toBe(true);
+    expect(res.body.recommendations.length).toBe(0);
+    expect(res.body).toHaveProperty('message');
+  });
+
+  test('returns 500 when logs exist but ANTHROPIC_API_KEY is not set', async () => {
+    // Add a log entry
+    mockChatLogs.push({
+      id: 200, site_id: 'legal', session_id: '', user_message: 'What is your fee?',
+      bot_response: 'Our fees vary.', created_at: new Date().toISOString()
+    });
+    const key = process.env.ANTHROPIC_API_KEY;
+    delete process.env.ANTHROPIC_API_KEY;
+    const res = await request(app).get('/api/recommendations/legal');
+    expect(res.status).toBe(500);
+    if (key) process.env.ANTHROPIC_API_KEY = key;
+    mockChatLogs = [];
   });
 });
