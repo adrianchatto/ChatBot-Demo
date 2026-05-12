@@ -72,7 +72,7 @@ describe('Public pages', () => {
   test('GET / returns the landing page', async () => {
     const res = await request(app).get('/');
     expect(res.status).toBe(200);
-    expect(res.text).toContain('chatoweb');
+    expect(res.text).toContain('chattoweb');
   });
 
   test('GET /login returns the login page', async () => {
@@ -249,6 +249,34 @@ describe('GET /api/sites', () => {
     expect(ids).toContain('legal');
     expect(ids).toContain('retail');
     expect(ids).toContain('gov');
+  });
+});
+
+// ── Chat endpoint — demo rate limit ──────────────────────────────────────────
+describe('POST /api/chat — demo rate limit', () => {
+  afterEach(() => {
+    app._resetChatCount();
+    process.env.CHAT_LIMIT = '0';
+  });
+
+  test('returns 429 when the chat limit is reached', async () => {
+    process.env.CHAT_LIMIT = '5';
+    app._setChatCount(5); // already at the limit
+    const res = await request(app)
+      .post('/api/chat')
+      .send({ siteId: 'legal', messages: [{ role: 'user', content: 'Hello' }] });
+    expect(res.status).toBe(429);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  test('does not rate-limit when CHAT_LIMIT is 0 (disabled)', async () => {
+    process.env.CHAT_LIMIT = '0';
+    app._setChatCount(9999);
+    const res = await request(app)
+      .post('/api/chat')
+      .send({ siteId: 'legal', messages: [{ role: 'user', content: 'Hello' }] });
+    // Should NOT be 429 — will be 500 (no API key in test env) instead
+    expect(res.status).not.toBe(429);
   });
 });
 

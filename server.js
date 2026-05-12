@@ -9,6 +9,13 @@ const { getDb, seedDatabase } = require('./database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ── Demo chat limit ───────────────────────────────────────────────────────────
+// Counts successful chat requests. Reset on server restart.
+// Set CHAT_LIMIT=0 in env to disable (used in tests).
+let chatRequestCount = 0;
+app._setChatCount   = (n) => { chatRequestCount = n; };
+app._resetChatCount = ()  => { chatRequestCount = 0; };
+
 // ── Anthropic client ──────────────────────────────────────────────────────────
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || ''
@@ -110,11 +117,21 @@ app.post('/api/chat', requireAuth, async (req, res) => {
     return res.status(400).json({ error: 'Invalid request: siteId and messages are required.' });
   }
 
+  // Demo rate limit — set CHAT_LIMIT=0 to disable
+  const chatLimit = parseInt(process.env.CHAT_LIMIT || '25', 10);
+  if (chatLimit > 0 && chatRequestCount >= chatLimit) {
+    return res.status(429).json({
+      error: 'This demo has reached its conversation limit. Please get in touch to discuss a full deployment.'
+    });
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return res.status(500).json({
       error: 'ANTHROPIC_API_KEY is not set. Check your .env file.'
     });
   }
+
+  chatRequestCount++;
 
   const db = getDb();
   const kbEntries = db
@@ -216,7 +233,7 @@ app.get('/api/sites', requireAuth, (req, res) => {
 if (require.main === module) {
   seedDatabase();
   app.listen(PORT, () => {
-    console.log(`\n  chatoweb.com platform running on http://localhost:${PORT}`);
+    console.log(`\n  chattoweb.com platform running on http://localhost:${PORT}`);
     console.log(`  Landing:  http://localhost:${PORT}/`);
     console.log(`  Login:    http://localhost:${PORT}/login`);
     console.log(`  Hub:      http://localhost:${PORT}/chatbot`);

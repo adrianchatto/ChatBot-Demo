@@ -6,3 +6,5 @@ process.env.DEMO_PASSWORD = 'testpassword';
 process.env.SESSION_SECRET = 'test-secret';
 // Use an in-memory-style temp DB for tests
 process.env.DB_PATH = ':memory:';
+// Disable demo chat limit in tests (0 = unlimited)
+process.env.CHAT_LIMIT = '0';
