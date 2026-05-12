@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harrington &amp; Associates | Solicitors</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1B2B5E;
+      --navy-light: #243873;
+      --gold: #C4A25A;
+      --gold-light: #d4b470;
+      --white: #ffffff;
+      --off-white: #f8f7f4;
+      --grey: #6b7280;
+      --dark: #1a1a2e;
+    }
+    body { font-family: Georgia, 'Times New Roman', serif; color: var(--dark); background: var(--white); }
+
+    /* ── Top bar ─────────────────────────────────────────────────── */
+    .topbar {
+      background: var(--navy);
+      color: rgba(255,255,255,0.75);
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      padding: 8px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topbar a { color: var(--gold); text-decoration: none; }
+
+    /* ── Header ──────────────────────────────────────────────────── */
+    header {
+      background: var(--white);
+      border-bottom: 3px solid var(--gold);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .logo { display: flex; align-items: center; gap: 14px; }
+    .logo-mark {
+      width: 48px; height: 48px;
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold);
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: -1px;
+    }
+    .logo-text h1 { font-size: 22px; color: var(--navy); letter-spacing: 0.5px; }
+    .logo-text p { font-size: 12px; color: var(--grey); font-family: Arial, sans-serif; letter-spacing: 2px; text-transform: uppercase; }
+    nav { display: flex; gap: 28px; font-family: Arial, sans-serif; font-size: 14px; }
+    nav a { text-decoration: none; color: var(--navy); font-weight: 600; transition: color 0.2s; }
+    nav a:hover { color: var(--gold); }
+    .nav-cta {
+      background: var(--gold);
+      color: var(--white) !important;
+      padding: 10px 20px;
+      font-weight: 700 !important;
+    }
+    .nav-cta:hover { background: var(--gold-light); color: var(--white) !important; }
+
+    /* ── Hero ────────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, #2d4a8a 100%);
+      color: var(--white);
+      padding: 100px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      border: 2px solid rgba(196,162,90,0.15);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      right: 40px; top: 40px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      border: 1px solid rgba(196,162,90,0.1);
+    }
+    .hero-inner { max-width: 640px; position: relative; z-index: 1; }
+    .hero-eyebrow {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .hero h2 { font-size: 48px; line-height: 1.15; margin-bottom: 20px; font-weight: normal; }
+    .hero h2 span { color: var(--gold); }
+    .hero p { font-family: Arial, sans-serif; font-size: 18px; color: rgba(255,255,255,0.8); line-height: 1.7; margin-bottom: 36px; }
+    .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--white);
+      padding: 16px 32px;
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-light); }
+    .btn-outline {
+      border: 2px solid rgba(255,255,255,0.5);
+      color: var(--white);
+      padding: 14px 30px;
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--white); }
+
+    /* ── Trust bar ───────────────────────────────────────────────── */
+    .trust-bar {
+      background: var(--gold);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+    .trust-item { text-align: center; font-family: Arial, sans-serif; }
+    .trust-item strong { display: block; font-size: 24px; color: var(--white); }
+    .trust-item span { font-size: 12px; color: rgba(255,255,255,0.85); letter-spacing: 1px; text-transform: uppercase; }
+
+    /* ── Services ────────────────────────────────────────────────── */
+    .services { padding: 80px 40px; background: var(--off-white); }
+    .section-label {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .services h2 { text-align: center; font-size: 36px; color: var(--navy); margin-bottom: 48px; font-weight: normal; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto; }
+    .service-card {
+      background: var(--white);
+      padding: 36px 28px;
+      border-top: 4px solid transparent;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .service-card:hover { border-top-color: var(--gold); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .service-icon { font-size: 32px; margin-bottom: 16px; }
+    .service-card h3 { font-size: 18px; color: var(--navy); margin-bottom: 10px; }
+    .service-card p { font-family: Arial, sans-serif; font-size: 14px; color: var(--grey); line-height: 1.7; }
+
+    /* ── Why us ──────────────────────────────────────────────────── */
+    .why-us { padding: 80px 40px; background: var(--navy); color: var(--white); }
+    .why-us h2 { text-align: center; font-size: 36px; margin-bottom: 48px; font-weight: normal; }
+    .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; max-width: 900px; margin: 0 auto; }
+    .why-item { text-align: center; }
+    .why-item .icon { font-size: 36px; margin-bottom: 14px; }
+    .why-item h4 { font-size: 16px; color: var(--gold); margin-bottom: 8px; }
+    .why-item p { font-family: Arial, sans-serif; font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,0.6);
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer a { color: var(--gold); text-decoration: none; }
+
+    /* ── Chatbot widget ──────────────────────────────────────────── */
+    #chat-toggle {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--navy);
+      border: 3px solid var(--gold);
+      color: var(--white);
+      font-size: 26px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    #chat-toggle:hover { transform: scale(1.08); }
+    #chat-panel {
+      position: fixed;
+      bottom: 100px; right: 28px;
+      width: 360px;
+      height: 500px;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+      display: flex; flex-direction: column;
+      z-index: 999;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    #chat-panel.hidden { opacity: 0; pointer-events: none; transform: translateY(10px); }
+    #chat-header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: Arial, sans-serif;
+    }
+    #chat-header-left { display: flex; align-items: center; gap: 10px; }
+    #chat-header-avatar {
+      width: 34px; height: 34px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    #chat-header-title { font-size: 14px; font-weight: 700; }
+    #chat-header-sub { font-size: 11px; color: rgba(255,255,255,0.65); }
+    #chat-close {
+      background: none; border: none; color: rgba(255,255,255,0.7);
+      font-size: 20px; cursor: pointer; line-height: 1;
+    }
+    #chat-close:hover { color: var(--white); }
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #f5f4f1;
+    }
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+    .msg.user {
+      background: var(--navy);
+      color: var(--white);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .msg.assistant {
+      background: var(--white);
+      color: var(--dark);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .typing { display: flex; align-items: center; gap: 5px; padding: 14px !important; }
+    .typing span {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+    #chat-input-area {
+      padding: 12px 14px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 8px;
+      background: var(--white);
+    }
+    #chat-input {
+      flex: 1;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      outline: none;
+      color: var(--dark);
+    }
+    #chat-input:focus { border-color: var(--navy); }
+    #chat-send {
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #chat-send:hover { background: var(--gold-light); }
+    #chat-send:disabled { background: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <span>Authorised and regulated by the Solicitors Regulation Authority &nbsp;|&nbsp; SRA No. 123456</span>
+    <span>Call us: <a href="tel:02079460000">020 7946 0000</a> &nbsp;|&nbsp; Mon–Fri 9am–6pm</span>
+  </div>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">H&amp;A</div>
+      <div class="logo-text">
+        <h1>Harrington &amp; Associates</h1>
+        <p>Solicitors &amp; Legal Advisors</p>
+      </div>
+    </div>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Services</a>
+      <a href="#">Our Team</a>
+      <a href="#">News</a>
+      <a href="#" class="nav-cta">Free Consultation</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">Expert Legal Representation</p>
+      <h2>We Fight for the <span>Outcome You Deserve</span></h2>
+      <p>With over 30 years of experience across personal injury, employment, family, and property law, our dedicated team is here to guide you through every step.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn-primary">Book a Free Consultation</a>
+        <a href="#" class="btn-outline">Our Services</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="trust-bar">
+    <div class="trust-item"><strong>30+</strong><span>Years Experience</span></div>
+    <div class="trust-item"><strong>98%</strong><span>Client Satisfaction</span></div>
+    <div class="trust-item"><strong>£50M+</strong><span>Damages Recovered</span></div>
+    <div class="trust-item"><strong>No Win</strong><span>No Fee Available</span></div>
+  </div>
+
+  <section class="services">
+    <p class="section-label">What We Do</p>
+    <h2>Our Areas of Expertise</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">⚖️</div>
+        <h3>Personal Injury</h3>
+        <p>Road accidents, workplace injuries, public liability, and medical negligence. No-win, no-fee arrangements available.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">💼</div>
+        <h3>Employment Law</h3>
+        <p>Unfair dismissal, redundancy, discrimination, settlement agreements, and employment tribunal representation.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏠</div>
+        <h3>Conveyancing</h3>
+        <p>Residential and commercial property purchases, sales, remortgages, and lease extensions. Fixed-fee quotes.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">👨‍👩‍👧</div>
+        <h3>Family Law</h3>
+        <p>Divorce, child arrangements, financial settlements, and cohabitation agreements handled with sensitivity.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📜</div>
+        <h3>Wills &amp; Probate</h3>
+        <p>Will drafting, lasting power of attorney, estate administration, and inheritance dispute resolution.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🛡️</div>
+        <h3>Civil Litigation</h3>
+        <p>Contract disputes, debt recovery, professional negligence, and neighbour disputes resolved efficiently.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="why-us">
+    <h2>Why Choose Harrington &amp; Associates?</h2>
+    <div class="why-grid">
+      <div class="why-item">
+        <div class="icon">🤝</div>
+        <h4>No Win, No Fee</h4>
+        <p>Access expert legal representation without upfront costs on eligible cases.</p>
+      </div>
+      <div class="why-item">
+        <div class="icon">⏱️</div>
+        <h4>Fast Response</h4>
+        <p>We respond to all enquiries within two working hours during business hours.</p>
+      </div>
+      <div class="why-item">
+        <div class="icon">🏆</div>
+        <h4>Award Winning</h4>
+        <p>Recognised by the Law Society and Legal 500 for excellence in client service.</p>
+      </div>
+      <div class="why-item">
+        <div class="icon">🔒</div>
+        <h4>Fully Regulated</h4>
+        <p>Authorised and regulated by the Solicitors Regulation Authority.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <strong style="color:white">Harrington &amp; Associates</strong><br>
+      14 Lincoln's Inn Fields, London WC2A 3BP<br>
+      &copy; 2025 Harrington &amp; Associates. All rights reserved.
+    </div>
+    <div style="text-align:right">
+      <a href="#">Privacy Policy</a> &nbsp;|&nbsp;
+      <a href="#">Terms &amp; Conditions</a> &nbsp;|&nbsp;
+      <a href="#">Cookie Policy</a><br>
+      SRA No. 123456 &nbsp;|&nbsp; VAT No. GB 123 456 789
+    </div>
+  </footer>
+
+  <!-- ── Chatbot widget ───────────────────────────────────────────── -->
+  <button id="chat-toggle" title="Chat with us">💬</button>
+
+  <div id="chat-panel" class="hidden">
+    <div id="chat-header">
+      <div id="chat-header-left">
+        <div id="chat-header-avatar">⚖️</div>
+        <div>
+          <div id="chat-header-title">Legal Assistant</div>
+          <div id="chat-header-sub">Harrington &amp; Associates</div>
+        </div>
+      </div>
+      <button id="chat-close">✕</button>
+    </div>
+    <div id="chat-messages">
+      <div class="msg assistant">Hello! I'm the Harrington &amp; Associates virtual assistant. I can answer questions about our services, fees, and how to get started. How can I help you today?</div>
+    </div>
+    <div id="chat-input-area">
+      <input id="chat-input" type="text" placeholder="Ask a question…" autocomplete="off">
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const SITE_ID = 'legal';
+    let chatHistory = [];
+    let isOpen = false;
+
+    document.getElementById('chat-toggle').addEventListener('click', () => {
+      isOpen = !isOpen;
+      document.getElementById('chat-panel').classList.toggle('hidden', !isOpen);
+      if (isOpen) document.getElementById('chat-input').focus();
+    });
+
+    document.getElementById('chat-close').addEventListener('click', () => {
+      isOpen = false;
+      document.getElementById('chat-panel').classList.add('hidden');
+    });
+
+    document.getElementById('chat-send').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      setInputEnabled(false);
+
+      chatHistory.push({ role: 'user', content: text });
+      appendMessage('user', text);
+
+      const typingEl = appendTyping();
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ siteId: SITE_ID, messages: chatHistory })
+        });
+
+        typingEl.remove();
+
+        if (!response.ok) {
+          const err = await response.json();
+          appendMessage('assistant', err.error || 'Something went wrong. Please try again.');
+          setInputEnabled(true);
+          return;
+        }
+
+        const msgEl = appendMessage('assistant', '');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = '';
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.text) { fullText += parsed.text; msgEl.textContent = fullText; scrollBottom(); }
+              if (parsed.error) { msgEl.textContent = parsed.error; }
+            } catch (_) {}
+          }
+        }
+
+        chatHistory.push({ role: 'assistant', content: fullText });
+      } catch (err) {
+        typingEl.remove();
+        appendMessage('assistant', 'Sorry, I could not connect. Please try again.');
+      }
+
+      setInputEnabled(true);
+      document.getElementById('chat-input').focus();
+    }
+
+    function appendMessage(role, text) {
+      const messages = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+      div.textContent = text;
+      messages.appendChild(div);
+      scrollBottom();
+      return div;
+    }
+
+    function appendTyping() {
+      const messages = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'msg assistant typing';
+      div.innerHTML = '<span></span><span></span><span></span>';
+      messages.appendChild(div);
+      scrollBottom();
+      return div;
+    }
+
+    function scrollBottom() {
+      const messages = document.getElementById('chat-messages');
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function setInputEnabled(enabled) {
+      document.getElementById('chat-input').disabled = !enabled;
+      document.getElementById('chat-send').disabled = !enabled;
+    }
+  </script>
+</body>
+</html>

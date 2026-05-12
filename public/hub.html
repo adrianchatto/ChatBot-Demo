@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot Demo — chatoweb.com</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0d14;
+      --card: #111520;
+      --border: #1e2438;
+      --accent: #4f8ef7;
+      --text: #e2e8f0;
+      --text-muted: #6b7a99;
+      --white: #ffffff;
+      --navy: #1B2B5E;
+      --gold: #C4A25A;
+      --green: #2D5016;
+      --gov-blue: #003078;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 18px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: var(--white); }
+    .logo-text { font-size: 16px; font-weight: 700; color: var(--white); }
+    .logo-text span { color: var(--accent); }
+    .header-right { display: flex; align-items: center; gap: 20px; }
+    .nav-link { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .nav-link:hover { color: var(--text); }
+    .logout-btn { color: var(--text-muted); font-size: 14px; text-decoration: none; }
+    .logout-btn:hover { color: var(--text); }
+
+    main { flex: 1; padding: 64px 48px; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+    .page-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .page-title { font-size: 40px; font-weight: 800; color: var(--white); letter-spacing: -1px; margin-bottom: 10px; }
+    .page-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 56px; line-height: 1.6; max-width: 560px; }
+
+    .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+
+    .demo-card {
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+
+    .card-banner {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      position: relative;
+    }
+    .card-banner.legal { background: linear-gradient(135deg, #1B2B5E, #2d4a8a); }
+    .card-banner.retail { background: linear-gradient(135deg, #2D5016, #4a8a20); }
+    .card-banner.gov { background: linear-gradient(135deg, #003078, #1d70b8); }
+
+    .card-sector-label {
+      position: absolute;
+      top: 12px; right: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      background: rgba(0,0,0,0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .card-body {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-top: none;
+      padding: 24px;
+      flex: 1;
+    }
+    .card-body h3 { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .card-body p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+    .card-features { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .card-features li { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .card-features li::before { content: '✓'; color: var(--accent); font-weight: 700; }
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .admin-strip {
+      margin-top: 56px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .admin-strip-left { display: flex; align-items: center; gap: 14px; }
+    .admin-icon { font-size: 28px; }
+    .admin-strip h4 { font-size: 15px; font-weight: 700; color: var(--white); }
+    .admin-strip p { font-size: 13px; color: var(--text-muted); }
+    .admin-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: border-color 0.2s;
+    }
+    .admin-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    footer {
+      padding: 20px 48px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="logo">
+      <div class="logo-mark">C</div>
+      <span class="logo-text">chato<span>web</span>.com</span>
+    </a>
+    <div class="header-right">
+      <a href="/" class="nav-link">← All demos</a>
+      <a href="/logout" class="logout-btn">Sign out</a>
+    </div>
+  </header>
+
+  <main>
+    <p class="page-eyebrow">AI Chatbot Demo</p>
+    <h1 class="page-title">Choose a sector</h1>
+    <p class="page-desc">Each demo shows how a Claude-powered chatbot can be tailored to a specific industry, with its own knowledge base, persona, and visual identity.</p>
+
+    <div class="demo-grid">
+
+      <a href="/chatbot/legal" class="demo-card">
+        <div class="card-banner legal">
+          <span class="card-sector-label">Legal</span>
+          ⚖️
+        </div>
+        <div class="card-body">
+          <h3>Harrington &amp; Associates</h3>
+          <p>A professional law firm chatbot that handles enquiries about services, fees, and how to get started.</p>
+          <ul class="card-features">
+            <li>Personal injury &amp; no-win, no-fee</li>
+            <li>Employment law &amp; disputes</li>
+            <li>Conveyancing &amp; wills</li>
+            <li>Consultation booking</li>
+          </ul>
+          <span class="card-cta">Open demo →</span>
+        </div>
+      </a>
+
+      <a href="/chatbot/retail" class="demo-card">
+        <div class="card-banner retail">
+          <span class="card-sector-label">Retail</span>
+          🌿
+        </div>
+        <div class="card-body">
+          <h3>Botanica Home</h3>
+          <p>A warm, helpful customer service chatbot for a sustainable home and lifestyle brand.</p>
+          <ul class="card-features">
+            <li>Orders, delivery &amp; tracking</li>
+            <li>Returns &amp; refund policy</li>
+            <li>Product &amp; sustainability info</li>
+            <li>Payment methods</li>
+          </ul>
+          <span class="card-cta">Open demo →</span>
+        </div>
+      </a>
+
+      <a href="/chatbot/gov" class="demo-card">
+        <div class="card-banner gov">
+          <span class="card-sector-label">Government</span>
+          🏛️
+        </div>
+        <div class="card-body">
+          <h3>Northgate District Council</h3>
+          <p>A clear, factual council services assistant that directs residents to the right information quickly.</p>
+          <ul class="card-features">
+            <li>Council tax &amp; payments</li>
+            <li>Planning permission</li>
+            <li>Bins, roads &amp; reporting</li>
+            <li>Housing benefit</li>
+          </ul>
+          <span class="card-cta">Open demo →</span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="admin-strip">
+      <div class="admin-strip-left">
+        <div class="admin-icon">⚙️</div>
+        <div>
+          <h4>Knowledge Base Manager</h4>
+          <p>Add, edit, or remove the information each chatbot can access. Changes take effect immediately.</p>
+        </div>
+      </div>
+      <a href="/admin" class="admin-btn">Open admin →</a>
+    </div>
+  </main>
+
+  <footer>
+    <span>© 2025 chatoweb.com — Powered by Claude</span>
+    <a href="/logout">Sign out</a>
+  </footer>
+
+</body>
+</html>

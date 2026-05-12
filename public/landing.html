@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>chatoweb.com — Client Demo Platform</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0d14;
+      --card: #111520;
+      --border: #1e2438;
+      --accent: #4f8ef7;
+      --accent-glow: rgba(79,142,247,0.15);
+      --text: #e2e8f0;
+      --text-muted: #6b7a99;
+      --white: #ffffff;
+      --green: #22c55e;
+      --amber: #f59e0b;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ──────────────────────────────────────────────────── */
+    header {
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-mark {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 900; color: var(--white);
+    }
+    .logo-text { font-size: 17px; font-weight: 700; color: var(--white); letter-spacing: -0.3px; }
+    .logo-text span { color: var(--accent); }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .tag {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .login-btn {
+      background: var(--accent);
+      color: var(--white);
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: opacity 0.2s;
+    }
+    .login-btn:hover { opacity: 0.85; }
+
+    /* ── Hero ────────────────────────────────────────────────────── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 48px 40px;
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(79,142,247,0.3);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+    .eyebrow::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .hero h1 {
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Projects grid ───────────────────────────────────────────── */
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 960px;
+      width: 100%;
+    }
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+    .project-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(79,142,247,0.1);
+    }
+    .project-card.coming-soon {
+      opacity: 0.5;
+      cursor: default;
+      pointer-events: none;
+    }
+    .card-top { display: flex; align-items: center; justify-content: space-between; }
+    .card-icon { font-size: 32px; }
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .status-live { background: rgba(34,197,94,0.12); color: var(--green); }
+    .status-soon { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .card-title { font-size: 18px; font-weight: 700; color: var(--white); }
+    .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .card-sectors { display: flex; gap: 6px; flex-wrap: wrap; }
+    .sector-tag {
+      font-size: 11px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .card-arrow { font-size: 18px; color: var(--accent); align-self: flex-end; }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    footer {
+      padding: 24px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <div class="logo-mark">C</div>
+      <span class="logo-text">chato<span>web</span>.com</span>
+    </div>
+    <div class="header-right">
+      <span class="tag">Client Demo Platform</span>
+      <a href="/login" class="login-btn">Sign in →</a>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="eyebrow">Live demos</div>
+    <h1>AI-powered experiences<br>built for <span>your sector</span></h1>
+    <p>Explore how conversational AI can transform customer interactions. Select a demo below — you'll need to sign in to access the content.</p>
+
+    <div class="projects">
+
+      <a href="/chatbot" class="project-card">
+        <div class="card-top">
+          <div class="card-icon">🤖</div>
+          <span class="status-badge status-live">● Live</span>
+        </div>
+        <div class="card-title">AI Chatbot Demo</div>
+        <div class="card-desc">Three sector-specific chatbot demonstrations, each powered by a tailored knowledge base and a custom persona.</div>
+        <div class="card-sectors">
+          <span class="sector-tag">Legal</span>
+          <span class="sector-tag">Retail</span>
+          <span class="sector-tag">Government</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </a>
+
+      <div class="project-card coming-soon">
+        <div class="card-top">
+          <div class="card-icon">📊</div>
+          <span class="status-badge status-soon">Coming soon</span>
+        </div>
+        <div class="card-title">Analytics Dashboard</div>
+        <div class="card-desc">Real-time conversation analytics, user journey mapping, and engagement metrics for deployed chatbot instances.</div>
+        <div class="card-sectors">
+          <span class="sector-tag">Reporting</span>
+          <span class="sector-tag">Insights</span>
+        </div>
+      </div>
+
+      <div class="project-card coming-soon">
+        <div class="card-top">
+          <div class="card-icon">📄</div>
+          <span class="status-badge status-soon">Coming soon</span>
+        </div>
+        <div class="card-title">Document Intelligence</div>
+        <div class="card-desc">Upload documents, extract key information, and query your content using natural language.</div>
+        <div class="card-sectors">
+          <span class="sector-tag">Legal</span>
+          <span class="sector-tag">Finance</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2025 chatoweb.com</span>
+    <a href="/login">Sign in to access demos →</a>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Northgate District Council</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0b0c0c;
+      --white: #ffffff;
+      --yellow: #ffdd00;
+      --yellow-focus: #ffbf47;
+      --blue: #1d70b8;
+      --blue-dark: #003078;
+      --green-gov: #00703c;
+      --grey-light: #f3f2f1;
+      --grey-mid: #b1b4b6;
+      --grey-dark: #505a5f;
+      --red: #d4351c;
+    }
+    body { font-family: Arial, Helvetica, sans-serif; color: var(--black); background: var(--white); font-size: 16px; }
+
+    /* ── Crown/GOV bar ───────────────────────────────────────────── */
+    .govuk-bar {
+      background: var(--black);
+      color: var(--white);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .govuk-logo-text { font-weight: 700; letter-spacing: 1px; }
+    .govuk-logo-crown { font-size: 20px; }
+
+    /* ── Cookie notice ───────────────────────────────────────────── */
+    .cookie-bar {
+      background: #00529e;
+      color: var(--white);
+      padding: 12px 24px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .cookie-bar a { color: var(--yellow); }
+    .cookie-accept {
+      background: var(--yellow);
+      color: var(--black);
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ── Main header ─────────────────────────────────────────────── */
+    header {
+      background: var(--blue-dark);
+      padding: 0 24px;
+      border-bottom: 10px solid var(--yellow);
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .council-name h1 { color: var(--white); font-size: 26px; font-weight: 700; }
+    .council-name p { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 2px; }
+    .header-search { display: flex; gap: 0; }
+    .header-search input {
+      padding: 10px 14px;
+      font-size: 14px;
+      border: none;
+      width: 240px;
+      outline: none;
+    }
+    .header-search button {
+      background: var(--yellow);
+      border: none;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--black);
+    }
+
+    /* ── Nav ─────────────────────────────────────────────────────── */
+    nav {
+      background: var(--blue);
+      padding: 0 24px;
+    }
+    nav ul {
+      max-width: 1100px;
+      margin: 0 auto;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    nav ul li a {
+      display: block;
+      color: var(--white);
+      text-decoration: none;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    nav ul li a:hover { background: var(--blue-dark); }
+    nav ul li.active a { border-bottom: 4px solid var(--yellow); }
+
+    /* ── Breadcrumb ──────────────────────────────────────────────── */
+    .breadcrumb { background: var(--grey-light); padding: 10px 24px; font-size: 14px; }
+    .breadcrumb-inner { max-width: 1100px; margin: 0 auto; }
+    .breadcrumb a { color: var(--blue); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb span { color: var(--grey-dark); }
+
+    /* ── Alert banner ────────────────────────────────────────────── */
+    .alert-banner {
+      background: #fdf7c3;
+      border-left: 6px solid #ffb300;
+      padding: 16px 24px;
+    }
+    .alert-inner { max-width: 1100px; margin: 0 auto; font-size: 15px; }
+    .alert-inner strong { display: block; margin-bottom: 4px; }
+
+    /* ── Main content ────────────────────────────────────────────── */
+    main { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+    .page-title { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+    .page-intro { font-size: 18px; color: var(--grey-dark); margin-bottom: 40px; line-height: 1.6; }
+
+    /* ── Service grid ────────────────────────────────────────────── */
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2px; margin-bottom: 48px; }
+    .service-tile {
+      background: var(--grey-light);
+      padding: 28px 24px;
+      display: block;
+      text-decoration: none;
+      color: var(--black);
+      border-left: 5px solid transparent;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .service-tile:hover { border-left-color: var(--blue); background: #e8e8e8; }
+    .service-tile-icon { font-size: 28px; margin-bottom: 10px; }
+    .service-tile h3 { font-size: 18px; color: var(--blue); font-weight: 700; margin-bottom: 6px; }
+    .service-tile p { font-size: 14px; color: var(--grey-dark); line-height: 1.5; }
+    .service-tile .arrow { color: var(--blue); font-size: 18px; margin-top: 10px; display: block; }
+
+    /* ── Popular tasks ───────────────────────────────────────────── */
+    .popular h2 { font-size: 24px; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 4px solid var(--yellow); display: inline-block; }
+    .task-list { list-style: none; margin-bottom: 48px; }
+    .task-list li { border-bottom: 1px solid var(--grey-mid); }
+    .task-list li a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      text-decoration: none;
+      color: var(--blue);
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .task-list li a:hover { text-decoration: underline; }
+    .task-list .arrow { color: var(--grey-dark); }
+
+    /* ── News ────────────────────────────────────────────────────── */
+    .news-section h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; }
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+    .news-card { border-top: 4px solid var(--blue); padding-top: 16px; }
+    .news-date { font-size: 13px; color: var(--grey-dark); margin-bottom: 8px; }
+    .news-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .news-card h4 a { color: var(--blue); text-decoration: none; }
+    .news-card h4 a:hover { text-decoration: underline; }
+    .news-card p { font-size: 14px; color: var(--grey-dark); line-height: 1.5; }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    .footer-top {
+      background: var(--black);
+      color: rgba(255,255,255,0.7);
+      padding: 40px 24px;
+      font-size: 14px;
+    }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; }
+    .footer-col h4 { color: var(--white); font-size: 15px; margin-bottom: 12px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 8px; }
+    .footer-col ul li a { color: rgba(255,255,255,0.7); text-decoration: none; }
+    .footer-col ul li a:hover { color: var(--white); }
+    .footer-bottom { background: #1a1a1a; color: rgba(255,255,255,0.5); font-size: 13px; padding: 16px 24px; text-align: center; }
+
+    /* ── Chatbot widget ──────────────────────────────────────────── */
+    #chat-toggle {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      z-index: 1000;
+      display: flex; align-items: center; gap: 10px;
+      border-left: 4px solid var(--yellow);
+    }
+    #chat-toggle:hover { background: var(--blue-dark); }
+    #chat-panel {
+      position: fixed;
+      bottom: 80px; right: 24px;
+      width: 380px; height: 520px;
+      background: var(--white);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      display: flex; flex-direction: column;
+      z-index: 999;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.2s;
+      border-top: 4px solid var(--yellow);
+    }
+    #chat-panel.hidden { opacity: 0; pointer-events: none; transform: translateY(10px); }
+    #chat-header {
+      background: var(--blue-dark);
+      color: var(--white);
+      padding: 16px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #chat-header-left { display: flex; align-items: center; gap: 10px; }
+    #chat-header-avatar {
+      width: 34px; height: 34px;
+      background: var(--yellow);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    #chat-header-title { font-size: 14px; font-weight: 700; }
+    #chat-header-sub { font-size: 11px; color: rgba(255,255,255,0.65); }
+    #chat-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 20px; cursor: pointer; }
+    #chat-close:hover { color: var(--white); }
+    #chat-messages {
+      flex: 1; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+      background: var(--grey-light);
+    }
+    .msg { max-width: 85%; padding: 10px 14px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+    .msg.user { background: var(--blue); color: var(--white); align-self: flex-end; }
+    .msg.assistant { background: var(--white); color: var(--black); align-self: flex-start; border-left: 3px solid var(--yellow); }
+    .typing { display: flex; align-items: center; gap: 5px; padding: 14px !important; }
+    .typing span { width: 8px; height: 8px; background: var(--blue); border-radius: 50%; animation: bounce 1.2s infinite; }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+    #chat-input-area { padding: 12px 14px; border-top: 1px solid var(--grey-mid); display: flex; gap: 8px; background: var(--white); }
+    #chat-input { flex: 1; border: 2px solid var(--grey-mid); padding: 10px 12px; font-size: 14px; outline: none; }
+    #chat-input:focus { border-color: var(--blue); outline: 3px solid var(--yellow-focus); }
+    #chat-send { background: var(--green-gov); color: var(--white); border: none; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    #chat-send:hover { background: #005a30; }
+    #chat-send:disabled { background: var(--grey-mid); cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <div class="govuk-bar">
+    <span class="govuk-logo-crown">♛</span>
+    <span class="govuk-logo-text">GOV.UK</span>
+    <span style="color:rgba(255,255,255,0.5); margin: 0 8px">|</span>
+    <span style="font-size:13px; color:rgba(255,255,255,0.75)">An official UK council website</span>
+  </div>
+
+  <div class="cookie-bar" id="cookieBar">
+    <span>We use cookies to make this site work. <a href="#">Find out more about our cookies</a> and how to manage them.</span>
+    <button class="cookie-accept" onclick="document.getElementById('cookieBar').style.display='none'">Accept cookies</button>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <div class="council-name">
+        <h1>Northgate District Council</h1>
+        <p>Serving the people of Northgate since 1974</p>
+      </div>
+      <div class="header-search">
+        <input type="text" placeholder="Search for a service…">
+        <button>Search</button>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <ul>
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="#">Council Tax</a></li>
+      <li><a href="#">Housing</a></li>
+      <li><a href="#">Planning</a></li>
+      <li><a href="#">Bins &amp; Recycling</a></li>
+      <li><a href="#">Roads</a></li>
+      <li><a href="#">Benefits</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="#">Home</a>
+    </div>
+  </div>
+
+  <div class="alert-banner">
+    <div class="alert-inner">
+      <strong>⚠️ Bank Holiday service changes — 26 May 2025</strong>
+      Bin collections and council offices will operate a reduced service on the bank holiday. <a href="#" style="color:var(--blue)">Check what's affected</a>
+    </div>
+  </div>
+
+  <main>
+    <h1 class="page-title">Welcome to Northgate District Council</h1>
+    <p class="page-intro">Find information and apply for council services including council tax, planning permission, housing, and waste collection.</p>
+
+    <div class="services-grid">
+      <a href="#" class="service-tile">
+        <div class="service-tile-icon">💰</div>
+        <h3>Council Tax</h3>
+        <p>Pay your bill, report a change of address, apply for a discount or exemption, or challenge your band.</p>
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="service-tile">
+        <div class="service-tile-icon">🏗️</div>
+        <h3>Planning &amp; Building</h3>
+        <p>Search planning applications, submit a new application, or get pre-application advice.</p>
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="service-tile">
+        <div class="service-tile-icon">🏠</div>
+        <h3>Housing</h3>
+        <p>Apply for social housing, report a repair, or get advice on homelessness and housing benefit.</p>
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="service-tile">
+        <div class="service-tile-icon">♻️</div>
+        <h3>Bins &amp; Recycling</h3>
+        <p>Find your bin collection day, report a missed collection, or book a bulky waste collection.</p>
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="service-tile">
+        <div class="service-tile-icon">🛣️</div>
+        <h3>Roads &amp; Environment</h3>
+        <p>Report a pothole, streetlight fault, graffiti, or fly-tipping. Track existing reports.</p>
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="service-tile">
+        <div class="service-tile-icon">💳</div>
+        <h3>Benefits &amp; Support</h3>
+        <p>Apply for housing benefit, council tax support, or find out what financial help is available.</p>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <section class="popular">
+      <h2>Most popular tasks</h2>
+      <ul class="task-list">
+        <li><a href="#">Pay my council tax <span class="arrow">→</span></a></li>
+        <li><a href="#">Find my bin collection day <span class="arrow">→</span></a></li>
+        <li><a href="#">Apply for planning permission <span class="arrow">→</span></a></li>
+        <li><a href="#">Report a pothole <span class="arrow">→</span></a></li>
+        <li><a href="#">Register to vote <span class="arrow">→</span></a></li>
+        <li><a href="#">Apply for a parking permit <span class="arrow">→</span></a></li>
+      </ul>
+    </section>
+
+    <section class="news-section">
+      <h2>Latest council news</h2>
+      <div class="news-grid">
+        <div class="news-card">
+          <p class="news-date">8 May 2025</p>
+          <h4><a href="#">New recycling facilities open at Northgate Civic Centre</a></h4>
+          <p>Residents can now recycle a wider range of materials including soft plastics and small electrical items.</p>
+        </div>
+        <div class="news-card">
+          <p class="news-date">2 May 2025</p>
+          <h4><a href="#">Council approves local plan housing targets</a></h4>
+          <p>Northgate District Council has approved its updated local plan, setting out housing and infrastructure targets for 2025–2040.</p>
+        </div>
+        <div class="news-card">
+          <p class="news-date">24 April 2025</p>
+          <h4><a href="#">Pothole repair programme delivers 3,000 fixes this year</a></h4>
+          <p>The council's highways team has repaired over 3,000 potholes since April, ahead of the annual target.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer-top">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#">Council Tax</a></li>
+          <li><a href="#">Planning</a></li>
+          <li><a href="#">Housing</a></li>
+          <li><a href="#">Bins</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Council</h4>
+        <ul>
+          <li><a href="#">About us</a></li>
+          <li><a href="#">Councillors</a></li>
+          <li><a href="#">Meetings</a></li>
+          <li><a href="#">Decisions</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact us</h4>
+        <ul>
+          <li><a href="#">General enquiries</a></li>
+          <li><a href="#">Report a problem</a></li>
+          <li><a href="#">Accessibility</a></li>
+          <li><a href="#">Freedom of Information</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Northgate District Council</h4>
+        <p style="margin-bottom:8px">Civic Centre, Market Square<br>Northgate NG1 1AA</p>
+        <p>Tel: 01632 960000<br>Mon–Fri 9am–5pm</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2025 Northgate District Council &nbsp;|&nbsp; Privacy Policy &nbsp;|&nbsp; Accessibility Statement &nbsp;|&nbsp; Cookies</div>
+
+  <!-- ── Chatbot widget ───────────────────────────────────────────── -->
+  <button id="chat-toggle">💬 &nbsp;Ask the council assistant</button>
+
+  <div id="chat-panel" class="hidden">
+    <div id="chat-header">
+      <div id="chat-header-left">
+        <div id="chat-header-avatar">🏛️</div>
+        <div>
+          <div id="chat-header-title">Council Services Assistant</div>
+          <div id="chat-header-sub">Northgate District Council</div>
+        </div>
+      </div>
+      <button id="chat-close">✕</button>
+    </div>
+    <div id="chat-messages">
+      <div class="msg assistant">Hello. I can help you with council services including council tax, planning, bins, and more. What do you need help with today?</div>
+    </div>
+    <div id="chat-input-area">
+      <input id="chat-input" type="text" placeholder="Type your question…" autocomplete="off">
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const SITE_ID = 'gov';
+    let chatHistory = [];
+    let isOpen = false;
+
+    document.getElementById('chat-toggle').addEventListener('click', () => {
+      isOpen = !isOpen;
+      document.getElementById('chat-panel').classList.toggle('hidden', !isOpen);
+      if (isOpen) document.getElementById('chat-input').focus();
+    });
+    document.getElementById('chat-close').addEventListener('click', () => {
+      isOpen = false;
+      document.getElementById('chat-panel').classList.add('hidden');
+    });
+    document.getElementById('chat-send').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      setInputEnabled(false);
+      chatHistory.push({ role: 'user', content: text });
+      appendMessage('user', text);
+      const typingEl = appendTyping();
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ siteId: SITE_ID, messages: chatHistory })
+        });
+        typingEl.remove();
+        if (!response.ok) {
+          const err = await response.json();
+          appendMessage('assistant', err.error || 'Something went wrong. Please try again.');
+          setInputEnabled(true); return;
+        }
+        const msgEl = appendMessage('assistant', '');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = '', buffer = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n'); buffer = lines.pop();
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.text) { fullText += parsed.text; msgEl.textContent = fullText; scrollBottom(); }
+              if (parsed.error) { msgEl.textContent = parsed.error; }
+            } catch (_) {}
+          }
+        }
+        chatHistory.push({ role: 'assistant', content: fullText });
+      } catch (err) {
+        typingEl.remove();
+        appendMessage('assistant', 'Sorry, I could not connect. Please try again.');
+      }
+      setInputEnabled(true);
+      document.getElementById('chat-input').focus();
+    }
+    function appendMessage(role, text) {
+      const messages = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = `msg ${role}`; div.textContent = text;
+      messages.appendChild(div); scrollBottom(); return div;
+    }
+    function appendTyping() {
+      const messages = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'msg assistant typing';
+      div.innerHTML = '<span></span><span></span><span></span>';
+      messages.appendChild(div); scrollBottom(); return div;
+    }
+    function scrollBottom() {
+      const m = document.getElementById('chat-messages'); m.scrollTop = m.scrollHeight;
+    }
+    function setInputEnabled(e) {
+      document.getElementById('chat-input').disabled = !e;
+      document.getElementById('chat-send').disabled = !e;
+    }
+  </script>
+</body>
+</html>

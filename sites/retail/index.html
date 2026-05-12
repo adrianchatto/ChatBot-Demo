@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Botanica Home | Natural Living</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #2D5016;
+      --green-mid: #3d6b1f;
+      --green-light: #5a8a2a;
+      --cream: #F5ECD7;
+      --cream-dark: #ede1c7;
+      --terracotta: #C4714A;
+      --white: #ffffff;
+      --dark: #1a1a0e;
+      --grey: #6b7260;
+    }
+    body { font-family: 'Trebuchet MS', Arial, sans-serif; color: var(--dark); background: var(--white); }
+
+    /* ── Header ──────────────────────────────────────────────────── */
+    .announcement-bar {
+      background: var(--green);
+      color: var(--white);
+      text-align: center;
+      font-size: 13px;
+      padding: 10px;
+      letter-spacing: 0.5px;
+    }
+    .announcement-bar strong { color: var(--cream); }
+    header {
+      background: var(--white);
+      border-bottom: 1px solid #e8e0d0;
+      padding: 18px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-leaf { font-size: 32px; }
+    .logo-words h1 { font-size: 22px; color: var(--green); letter-spacing: 1px; font-weight: 700; }
+    .logo-words p { font-size: 10px; color: var(--grey); letter-spacing: 3px; text-transform: uppercase; }
+    nav { display: flex; gap: 24px; font-size: 14px; font-weight: 600; }
+    nav a { text-decoration: none; color: var(--dark); transition: color 0.2s; }
+    nav a:hover { color: var(--green); }
+    nav .sale { color: var(--terracotta) !important; }
+    .header-right { display: flex; align-items: center; gap: 18px; font-size: 20px; }
+    .header-right span { cursor: pointer; }
+
+    /* ── Hero ────────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--cream) 0%, #e8dfc6 40%, var(--cream-dark) 100%);
+      padding: 80px 48px;
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      min-height: 520px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-text { flex: 1; max-width: 540px; }
+    .hero-tag {
+      display: inline-block;
+      background: var(--green);
+      color: var(--white);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+    .hero h2 { font-size: 52px; line-height: 1.1; color: var(--green); margin-bottom: 16px; font-weight: 700; }
+    .hero h2 em { color: var(--terracotta); font-style: normal; }
+    .hero p { font-size: 17px; color: var(--grey); line-height: 1.7; margin-bottom: 32px; }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-green {
+      background: var(--green);
+      color: var(--white);
+      padding: 14px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .btn-green:hover { background: var(--green-mid); }
+    .btn-outline {
+      border: 2px solid var(--green);
+      color: var(--green);
+      padding: 12px 26px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: var(--green); color: var(--white); }
+    .hero-visual {
+      flex: 0 0 340px;
+      height: 340px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 120px;
+      opacity: 0.9;
+    }
+
+    /* ── USPs ────────────────────────────────────────────────────── */
+    .usps {
+      background: var(--green);
+      padding: 20px 48px;
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    .usp-item { display: flex; align-items: center; gap: 10px; color: var(--white); font-size: 13px; font-weight: 600; }
+    .usp-item span { font-size: 18px; }
+
+    /* ── Categories ──────────────────────────────────────────────── */
+    .categories { padding: 80px 48px; background: var(--white); }
+    .section-tag { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--terracotta); margin-bottom: 10px; }
+    .categories h2 { font-size: 34px; color: var(--green); margin-bottom: 40px; font-weight: 700; }
+    .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .cat-card {
+      background: var(--cream);
+      border-radius: 8px;
+      padding: 36px 24px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--dark);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(45,80,22,0.12); }
+    .cat-card .cat-icon { font-size: 40px; margin-bottom: 12px; }
+    .cat-card h3 { font-size: 16px; color: var(--green); font-weight: 700; margin-bottom: 6px; }
+    .cat-card p { font-size: 12px; color: var(--grey); }
+
+    /* ── Featured products ───────────────────────────────────────── */
+    .products { padding: 80px 48px; background: var(--cream); }
+    .products-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; }
+    .products-header h2 { font-size: 34px; color: var(--green); font-weight: 700; }
+    .products-header a { color: var(--terracotta); font-size: 14px; font-weight: 600; text-decoration: none; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+    .product-card { background: var(--white); border-radius: 8px; overflow: hidden; transition: box-shadow 0.2s; }
+    .product-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .product-image {
+      height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 72px;
+    }
+    .product-image.bg1 { background: #d4e8c0; }
+    .product-image.bg2 { background: #e8d4b8; }
+    .product-image.bg3 { background: #c8d8e8; }
+    .product-image.bg4 { background: #e8c8d4; }
+    .product-info { padding: 16px; }
+    .product-tag { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey); }
+    .product-info h4 { font-size: 15px; color: var(--dark); margin: 6px 0 4px; font-weight: 700; }
+    .product-info p { font-size: 13px; color: var(--grey); margin-bottom: 10px; line-height: 1.4; }
+    .product-footer { display: flex; justify-content: space-between; align-items: center; }
+    .price { font-size: 17px; font-weight: 700; color: var(--green); }
+    .add-btn {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 4px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .add-btn:hover { background: var(--green-mid); }
+
+    /* ── Sustainability ───────────────────────────────────────────── */
+    .sustainability {
+      background: var(--green);
+      color: var(--white);
+      padding: 60px 48px;
+      display: flex;
+      align-items: center;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+    .sus-text { flex: 1; min-width: 280px; }
+    .sus-text h2 { font-size: 32px; margin-bottom: 14px; font-weight: 700; }
+    .sus-text p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.8); }
+    .sus-badges { display: flex; gap: 20px; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.12); border-radius: 8px; padding: 20px 24px; text-align: center; min-width: 120px; }
+    .badge .big { font-size: 28px; font-weight: 700; color: var(--cream); }
+    .badge small { font-size: 11px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    footer {
+      background: var(--dark);
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      padding: 40px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer a { color: var(--cream); text-decoration: none; }
+
+    /* ── Chatbot widget ──────────────────────────────────────────── */
+    #chat-toggle {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--green);
+      border: none;
+      color: var(--white);
+      font-size: 26px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(45,80,22,0.4);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    #chat-toggle:hover { transform: scale(1.08); }
+    #chat-panel {
+      position: fixed;
+      bottom: 100px; right: 28px;
+      width: 360px; height: 500px;
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      display: flex; flex-direction: column;
+      z-index: 999;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    #chat-panel.hidden { opacity: 0; pointer-events: none; transform: translateY(10px); }
+    #chat-header {
+      background: var(--green);
+      color: var(--white);
+      padding: 16px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #chat-header-left { display: flex; align-items: center; gap: 10px; }
+    #chat-header-avatar {
+      width: 34px; height: 34px;
+      background: var(--cream);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    #chat-header-title { font-size: 14px; font-weight: 700; }
+    #chat-header-sub { font-size: 11px; color: rgba(255,255,255,0.65); }
+    #chat-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 20px; cursor: pointer; }
+    #chat-close:hover { color: var(--white); }
+    #chat-messages {
+      flex: 1; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+      background: #f5f3ee;
+    }
+    .msg {
+      max-width: 85%; padding: 10px 14px; border-radius: 16px;
+      font-size: 14px; line-height: 1.5; word-wrap: break-word;
+    }
+    .msg.user { background: var(--green); color: var(--white); align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.assistant { background: var(--white); color: var(--dark); align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .typing { display: flex; align-items: center; gap: 5px; padding: 14px !important; }
+    .typing span { width: 8px; height: 8px; background: var(--terracotta); border-radius: 50%; animation: bounce 1.2s infinite; }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+    #chat-input-area { padding: 12px 14px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; background: var(--white); }
+    #chat-input { flex: 1; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none; }
+    #chat-input:focus { border-color: var(--green); }
+    #chat-send { background: var(--terracotta); color: var(--white); border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    #chat-send:hover { opacity: 0.85; }
+    #chat-send:disabled { background: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <div class="announcement-bar">🌿 Free delivery on orders over £50 &nbsp;|&nbsp; <strong>New season collection now live</strong> &nbsp;|&nbsp; B Corp Certified</div>
+
+  <header>
+    <a href="#" class="logo">
+      <span class="logo-leaf">🌿</span>
+      <div class="logo-words">
+        <h1>BOTANICA</h1>
+        <p>Home &amp; Living</p>
+      </div>
+    </a>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Shop</a>
+      <a href="#">New In</a>
+      <a href="#">Sustainability</a>
+      <a href="#" class="sale">Sale</a>
+    </nav>
+    <div class="header-right">
+      <span title="Search">🔍</span>
+      <span title="Wishlist">🤍</span>
+      <span title="Basket">🛒</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-text">
+      <span class="hero-tag">New Season Collection</span>
+      <h2>Bring <em>Nature</em> Home</h2>
+      <p>Beautifully crafted homeware made from natural, recycled, and sustainably certified materials. Every piece tells a story — and every purchase plants a tree.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn-green">Shop Now</a>
+        <a href="#" class="btn-outline">Our Story</a>
+      </div>
+    </div>
+    <div class="hero-visual">🪴</div>
+  </section>
+
+  <div class="usps">
+    <div class="usp-item"><span>🚚</span> Free delivery over £50</div>
+    <div class="usp-item"><span>🔄</span> 30-day free returns</div>
+    <div class="usp-item"><span>🌱</span> Plant a tree with every order</div>
+    <div class="usp-item"><span>⭐</span> 4.9/5 from 12,000 reviews</div>
+  </div>
+
+  <section class="categories">
+    <p class="section-tag">Browse by Room</p>
+    <h2>Shop by Category</h2>
+    <div class="cat-grid">
+      <a href="#" class="cat-card">
+        <div class="cat-icon">🛋️</div>
+        <h3>Living Room</h3>
+        <p>Cushions, throws &amp; décor</p>
+      </a>
+      <a href="#" class="cat-card">
+        <div class="cat-icon">🛏️</div>
+        <h3>Bedroom</h3>
+        <p>Bedding, lamps &amp; storage</p>
+      </a>
+      <a href="#" class="cat-card">
+        <div class="cat-icon">🍃</div>
+        <h3>Kitchen</h3>
+        <p>Utensils, boards &amp; ceramics</p>
+      </a>
+      <a href="#" class="cat-card">
+        <div class="cat-icon">🌻</div>
+        <h3>Garden</h3>
+        <p>Planters, tools &amp; outdoor</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="products">
+    <div class="products-header">
+      <h2>Featured Products</h2>
+      <a href="#">View all →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="product-image bg1">🪴</div>
+        <div class="product-info">
+          <div class="product-tag">Living Room</div>
+          <h4>Handwoven Seagrass Basket</h4>
+          <p>Natural seagrass, sustainably harvested from Vietnamese farms.</p>
+          <div class="product-footer">
+            <span class="price">£34.99</span>
+            <button class="add-btn">Add to bag</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image bg2">🕯️</div>
+        <div class="product-info">
+          <div class="product-tag">Home Fragrance</div>
+          <h4>Soy Wax Candle Set</h4>
+          <p>Hand-poured, 45-hour burn time, glass jar made from recycled materials.</p>
+          <div class="product-footer">
+            <span class="price">£28.00</span>
+            <button class="add-btn">Add to bag</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image bg3">🏺</div>
+        <div class="product-info">
+          <div class="product-tag">Kitchen</div>
+          <h4>Speckled Ceramic Mug</h4>
+          <p>Wheel-thrown by UK potters using locally sourced clay. Dishwasher safe.</p>
+          <div class="product-footer">
+            <span class="price">£19.50</span>
+            <button class="add-btn">Add to bag</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-image bg4">🛏️</div>
+        <div class="product-info">
+          <div class="product-tag">Bedroom</div>
+          <h4>Organic Cotton Throw</h4>
+          <p>GOTS-certified organic cotton. Softens with every wash. 130×180cm.</p>
+          <div class="product-footer">
+            <span class="price">£55.00</span>
+            <button class="add-btn">Add to bag</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sustainability">
+    <div class="sus-text">
+      <h2>Rooted in sustainability</h2>
+      <p>We believe beautiful homes shouldn't cost the earth. Over 80% of our range uses natural, recycled, or sustainably certified materials. We're a certified B Corp, and we're working towards 100% sustainable sourcing by 2027.</p>
+    </div>
+    <div class="sus-badges">
+      <div class="badge"><div class="big">B Corp</div><small>Certified</small></div>
+      <div class="badge"><div class="big">80%</div><small>Sustainable materials</small></div>
+      <div class="badge"><div class="big">250K</div><small>Trees planted</small></div>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <strong style="color:white">Botanica Home Ltd.</strong><br>
+      Unit 12, Green Quarter, Manchester M4 4BX<br>
+      &copy; 2025 Botanica Home. All rights reserved.
+    </div>
+    <div style="text-align:right">
+      <a href="#">Privacy Policy</a> &nbsp;|&nbsp;
+      <a href="#">Returns</a> &nbsp;|&nbsp;
+      <a href="#">Contact Us</a>
+    </div>
+  </footer>
+
+  <!-- ── Chatbot widget ───────────────────────────────────────────── -->
+  <button id="chat-toggle" title="Chat with us">💬</button>
+
+  <div id="chat-panel" class="hidden">
+    <div id="chat-header">
+      <div id="chat-header-left">
+        <div id="chat-header-avatar">🌿</div>
+        <div>
+          <div id="chat-header-title">Botanica Assistant</div>
+          <div id="chat-header-sub">Usually replies instantly</div>
+        </div>
+      </div>
+      <button id="chat-close">✕</button>
+    </div>
+    <div id="chat-messages">
+      <div class="msg assistant">Hi there! 👋 I'm the Botanica Home assistant. Ask me about orders, delivery, returns, or anything about our products.</div>
+    </div>
+    <div id="chat-input-area">
+      <input id="chat-input" type="text" placeholder="Ask a question…" autocomplete="off">
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const SITE_ID = 'retail';
+    let chatHistory = [];
+    let isOpen = false;
+
+    document.getElementById('chat-toggle').addEventListener('click', () => {
+      isOpen = !isOpen;
+      document.getElementById('chat-panel').classList.toggle('hidden', !isOpen);
+      if (isOpen) document.getElementById('chat-input').focus();
+    });
+    document.getElementById('chat-close').addEventListener('click', () => {
+      isOpen = false;
+      document.getElementById('chat-panel').classList.add('hidden');
+    });
+    document.getElementById('chat-send').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      setInputEnabled(false);
+      chatHistory.push({ role: 'user', content: text });
+      appendMessage('user', text);
+      const typingEl = appendTyping();
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ siteId: SITE_ID, messages: chatHistory })
+        });
+        typingEl.remove();
+        if (!response.ok) {
+          const err = await response.json();
+          appendMessage('assistant', err.error || 'Something went wrong. Please try again.');
+          setInputEnabled(true); return;
+        }
+        const msgEl = appendMessage('assistant', '');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = '', buffer = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n'); buffer = lines.pop();
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.text) { fullText += parsed.text; msgEl.textContent = fullText; scrollBottom(); }
+              if (parsed.error) { msgEl.textContent = parsed.error; }
+            } catch (_) {}
+          }
+        }
+        chatHistory.push({ role: 'assistant', content: fullText });
+      } catch (err) {
+        typingEl.remove();
+        appendMessage('assistant', 'Sorry, I could not connect. Please try again.');
+      }
+      setInputEnabled(true);
+      document.getElementById('chat-input').focus();
+    }
+    function appendMessage(role, text) {
+      const messages = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = `msg ${role}`; div.textContent = text;
+      messages.appendChild(div); scrollBottom(); return div;
+    }
+    function appendTyping() {
+      const messages = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'msg assistant typing';
+      div.innerHTML = '<span></span><span></span><span></span>';
+      messages.appendChild(div); scrollBottom(); return div;
+    }
+    function scrollBottom() {
+      const m = document.getElementById('chat-messages'); m.scrollTop = m.scrollHeight;
+    }
+    function setInputEnabled(e) {
+      document.getElementById('chat-input').disabled = !e;
+      document.getElementById('chat-send').disabled = !e;
+    }
+  </script>
+</body>
+</html>

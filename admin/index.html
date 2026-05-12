@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Base — Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --sidebar: #1a1d27;
+      --card: #21253a;
+      --border: #2e3347;
+      --accent: #4f8ef7;
+      --accent-hover: #3a7ae8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --text: #e2e8f0;
+      --text-muted: #8892a4;
+      --white: #ffffff;
+    }
+    html, body { height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Sidebar ─────────────────────────────────────────────────── */
+    aside {
+      width: 240px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-header {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-header h1 { font-size: 16px; font-weight: 700; color: var(--white); }
+    .sidebar-header p { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .sidebar-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); padding: 20px 20px 8px; }
+    .site-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      width: 100%;
+      text-align: left;
+      transition: background 0.15s, color 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .site-btn:hover { background: rgba(79,142,247,0.08); color: var(--text); }
+    .site-btn.active { background: rgba(79,142,247,0.12); color: var(--accent); border-left-color: var(--accent); }
+    .site-btn .badge {
+      margin-left: auto;
+      background: var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      min-width: 28px;
+      text-align: center;
+    }
+    .site-btn.active .badge { background: rgba(79,142,247,0.2); color: var(--accent); }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ── Main ────────────────────────────────────────────────────── */
+    main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Topbar ──────────────────────────────────────────────────── */
+    .topbar {
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .topbar-left h2 { font-size: 20px; font-weight: 700; color: var(--white); }
+    .topbar-left p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    .add-btn {
+      background: var(--accent);
+      color: var(--white);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .add-btn:hover { background: var(--accent-hover); }
+
+    /* ── Stats row ───────────────────────────────────────────────── */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      padding: 20px 32px;
+      flex-shrink: 0;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      min-width: 120px;
+    }
+    .stat-card .val { font-size: 28px; font-weight: 700; color: var(--white); }
+    .stat-card .lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Table area ──────────────────────────────────────────────── */
+    .table-area { flex: 1; overflow-y: auto; padding: 0 32px 32px; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .filter-input {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      width: 280px;
+      outline: none;
+    }
+    .filter-input:focus { border-color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+    tr:hover td { background: rgba(79,142,247,0.03); }
+    .category-tag {
+      background: rgba(79,142,247,0.12);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .question-cell { font-weight: 600; color: var(--white); margin-bottom: 4px; }
+    .answer-preview { font-size: 13px; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .actions { display: flex; gap: 8px; white-space: nowrap; }
+    .btn-edit, .btn-delete {
+      border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn-edit { background: rgba(79,142,247,0.15); color: var(--accent); }
+    .btn-edit:hover { background: rgba(79,142,247,0.25); }
+    .btn-delete { background: rgba(239,68,68,0.12); color: var(--red); }
+    .btn-delete:hover { background: rgba(239,68,68,0.22); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state h3 { color: var(--text); margin-bottom: 8px; }
+    .loading { text-align: center; padding: 40px; color: var(--text-muted); }
+
+    /* ── Modal ───────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      width: 560px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(8px);
+      transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal h3 { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 24px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+      resize: vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+    .form-group textarea { min-height: 120px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+    .btn-cancel {
+      background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer;
+    }
+    .btn-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+    .btn-save { background: var(--accent); color: var(--white); border: none; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-save:hover { background: var(--accent-hover); }
+
+    /* ── Toast ───────────────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--green); color: var(--white);
+      padding: 12px 24px; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      z-index: 2000;
+      transition: transform 0.3s;
+    }
+    .toast.error { background: var(--red); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── Scrollbar ───────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <aside>
+    <div class="sidebar-header">
+      <h1>⚙️ KB Manager</h1>
+      <p>Knowledge Base Admin</p>
+    </div>
+    <div class="sidebar-label">Demo Sites</div>
+    <div id="site-buttons"></div>
+    <div class="sidebar-footer">Chatbot Demo &middot; MVP</div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="topbar-left">
+        <h2 id="site-name">Select a site</h2>
+        <p id="site-subtitle">Choose a site from the left to manage its knowledge base</p>
+      </div>
+      <button class="add-btn" id="add-btn" style="display:none" onclick="openModal()">
+        + Add entry
+      </button>
+    </div>
+
+    <div class="stats-row" id="stats-row" style="display:none">
+      <div class="stat-card"><div class="val" id="stat-total">—</div><div class="lbl">Total entries</div></div>
+      <div class="stat-card"><div class="val" id="stat-cats">—</div><div class="lbl">Categories</div></div>
+    </div>
+
+    <div class="table-area">
+      <div class="table-header" id="table-header" style="display:none">
+        <input class="filter-input" id="filter-input" type="text" placeholder="Filter by keyword…">
+        <span id="entry-count" style="font-size:13px; color:var(--text-muted)"></span>
+      </div>
+
+      <div id="table-container">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <h3>Select a site to get started</h3>
+          <p>Choose a demo site from the sidebar to view and edit its knowledge base.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Modal ──────────────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <h3 id="modal-title">Add knowledge base entry</h3>
+      <div class="form-group">
+        <label>Category</label>
+        <input type="text" id="field-category" placeholder="e.g. Personal Injury, Delivery, Council Tax">
+      </div>
+      <div class="form-group">
+        <label>Question *</label>
+        <input type="text" id="field-question" placeholder="What question does this answer?">
+      </div>
+      <div class="form-group">
+        <label>Answer *</label>
+        <textarea id="field-answer" placeholder="Write the full answer the chatbot should give…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-save" onclick="saveEntry()">Save entry</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast ──────────────────────────────────────────────────────── -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentSite = null;
+    let entries = [];
+    let editingId = null;
+    let siteCounts = {};
+
+    // ── Init ──────────────────────────────────────────────────────────
+    async function init() {
+      const res = await fetch('/api/sites');
+      const sites = await res.json();
+
+      const container = document.getElementById('site-buttons');
+      for (const site of sites) {
+        const btn = document.createElement('button');
+        btn.className = 'site-btn';
+        btn.dataset.id = site.id;
+        btn.innerHTML = `<span>${siteIcon(site.id)}</span> ${site.name} <span class="badge" id="badge-${site.id}">…</span>`;
+        btn.onclick = () => loadSite(site.id, site.name);
+        container.appendChild(btn);
+        fetchCount(site.id);
+      }
+    }
+
+    async function fetchCount(siteId) {
+      const res = await fetch(`/api/kb/${siteId}`);
+      const data = await res.json();
+      siteCounts[siteId] = data.length;
+      const badge = document.getElementById(`badge-${siteId}`);
+      if (badge) badge.textContent = data.length;
+    }
+
+    function siteIcon(id) {
+      return { legal: '⚖️', retail: '🛒', gov: '🏛️' }[id] || '📄';
+    }
+
+    // ── Load site ─────────────────────────────────────────────────────
+    async function loadSite(siteId, siteName) {
+      currentSite = siteId;
+
+      document.querySelectorAll('.site-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`[data-id="${siteId}"]`).classList.add('active');
+
+      document.getElementById('site-name').textContent = `${siteIcon(siteId)} ${siteName}`;
+      document.getElementById('site-subtitle').textContent = `Managing knowledge base entries for ${siteName}`;
+      document.getElementById('add-btn').style.display = 'flex';
+      document.getElementById('stats-row').style.display = 'flex';
+      document.getElementById('table-header').style.display = 'flex';
+
+      document.getElementById('table-container').innerHTML = '<div class="loading">Loading entries…</div>';
+
+      const res = await fetch(`/api/kb/${siteId}`);
+      entries = await res.json();
+
+      renderTable(entries);
+      updateStats(entries);
+    }
+
+    // ── Render table ──────────────────────────────────────────────────
+    function renderTable(data) {
+      if (data.length === 0) {
+        document.getElementById('table-container').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📭</div>
+            <h3>No entries yet</h3>
+            <p>Click "Add entry" to add the first knowledge base entry for this site.</p>
+          </div>`;
+        document.getElementById('entry-count').textContent = '0 entries';
+        return;
+      }
+
+      document.getElementById('entry-count').textContent = `${data.length} entr${data.length === 1 ? 'y' : 'ies'}`;
+
+      const rows = data.map(e => `
+        <tr>
+          <td><span class="category-tag">${esc(e.category || 'General')}</span></td>
+          <td>
+            <div class="question-cell">${esc(e.question)}</div>
+            <div class="answer-preview">${esc(e.answer)}</div>
+          </td>
+          <td>
+            <div class="actions">
+              <button class="btn-edit" onclick="openEditModal(${e.id})">Edit</button>
+              <button class="btn-delete" onclick="deleteEntry(${e.id})">Delete</button>
+            </div>
+          </td>
+        </tr>`).join('');
+
+      document.getElementById('table-container').innerHTML = `
+        <table>
+          <thead><tr><th style="width:150px">Category</th><th>Question &amp; Answer</th><th style="width:120px">Actions</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    function updateStats(data) {
+      document.getElementById('stat-total').textContent = data.length;
+      const cats = new Set(data.map(e => e.category).filter(Boolean));
+      document.getElementById('stat-cats').textContent = cats.size;
+    }
+
+    // ── Filter ────────────────────────────────────────────────────────
+    document.getElementById('filter-input').addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      const filtered = entries.filter(en =>
+        en.question.toLowerCase().includes(q) ||
+        en.answer.toLowerCase().includes(q) ||
+        (en.category || '').toLowerCase().includes(q)
+      );
+      renderTable(filtered);
+    });
+
+    // ── Modal: add ────────────────────────────────────────────────────
+    function openModal() {
+      editingId = null;
+      document.getElementById('modal-title').textContent = 'Add knowledge base entry';
+      document.getElementById('field-category').value = '';
+      document.getElementById('field-question').value = '';
+      document.getElementById('field-answer').value = '';
+      document.getElementById('modal-overlay').classList.add('open');
+      document.getElementById('field-category').focus();
+    }
+
+    // ── Modal: edit ───────────────────────────────────────────────────
+    function openEditModal(id) {
+      const entry = entries.find(e => e.id === id);
+      if (!entry) return;
+      editingId = id;
+      document.getElementById('modal-title').textContent = 'Edit entry';
+      document.getElementById('field-category').value = entry.category || '';
+      document.getElementById('field-question').value = entry.question;
+      document.getElementById('field-answer').value = entry.answer;
+      document.getElementById('modal-overlay').classList.add('open');
+      document.getElementById('field-question').focus();
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+    }
+
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    // ── Save ──────────────────────────────────────────────────────────
+    async function saveEntry() {
+      const category = document.getElementById('field-category').value.trim();
+      const question = document.getElementById('field-question').value.trim();
+      const answer   = document.getElementById('field-answer').value.trim();
+
+      if (!question || !answer) {
+        showToast('Question and answer are required.', true);
+        return;
+      }
+
+      try {
+        if (editingId) {
+          await fetch(`/api/kb/${editingId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category, question, answer })
+          });
+          showToast('Entry updated.');
+        } else {
+          await fetch('/api/kb', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ site_id: currentSite, category, question, answer })
+          });
+          showToast('Entry added.');
+        }
+        closeModal();
+        await loadSite(currentSite, document.getElementById('site-name').textContent.slice(3));
+        await fetchCount(currentSite);
+      } catch (err) {
+        showToast('Failed to save. Please try again.', true);
+      }
+    }
+
+    // ── Delete ────────────────────────────────────────────────────────
+    async function deleteEntry(id) {
+      if (!confirm('Delete this entry? This cannot be undone.')) return;
+      await fetch(`/api/kb/${id}`, { method: 'DELETE' });
+      showToast('Entry deleted.');
+      await loadSite(currentSite, document.getElementById('site-name').textContent.slice(3));
+      await fetchCount(currentSite);
+    }
+
+    // ── Toast ─────────────────────────────────────────────────────────
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast${isError ? ' error' : ''} show`;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    function esc(str) {
+      return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    init();
+  </script>
+</body>
+</html>
