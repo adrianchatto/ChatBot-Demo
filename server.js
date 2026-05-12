@@ -289,8 +289,17 @@ Return ONLY valid JSON array, no other text. Example format:
 
     let recommendations = [];
     try {
-      recommendations = JSON.parse(response.content[0].text.trim());
-    } catch (_) {
+      let text = response.content[0].text.trim();
+      // Strip markdown code fences if Claude wraps the JSON (e.g. ```json ... ```)
+      text = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?\s*```\s*$/i, '');
+      // Extract the JSON array in case there is surrounding prose
+      const arrayMatch = text.match(/\[[\s\S]*\]/);
+      if (arrayMatch) {
+        recommendations = JSON.parse(arrayMatch[0]);
+      }
+      if (!Array.isArray(recommendations)) recommendations = [];
+    } catch (parseErr) {
+      console.error('Recommendations parse error:', parseErr.message);
       recommendations = [];
     }
     res.json({ recommendations });

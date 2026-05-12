@@ -599,12 +599,30 @@
         const res = await fetch(`/api/recommendations/${currentSite}`);
         const data = await res.json();
 
-        if (data.message || !data.recommendations || data.recommendations.length === 0) {
+        if (data.error) {
           document.getElementById('rec-container').innerHTML = `
             <div class="empty-state">
-              <div class="icon">💡</div>
-              <h3>No recommendations yet</h3>
-              <p>${esc(data.message || 'Start chatting to generate recommendations.')}</p>
+              <div class="icon">⚠️</div>
+              <h3>Could not generate recommendations</h3>
+              <p>${esc(data.error)}</p>
+            </div>`;
+          return;
+        }
+        if (data.message) {
+          document.getElementById('rec-container').innerHTML = `
+            <div class="empty-state">
+              <div class="icon">💬</div>
+              <h3>No chat history yet</h3>
+              <p>${esc(data.message)}</p>
+            </div>`;
+          return;
+        }
+        if (!data.recommendations || data.recommendations.length === 0) {
+          document.getElementById('rec-container').innerHTML = `
+            <div class="empty-state">
+              <div class="icon">✅</div>
+              <h3>Knowledge base looks complete</h3>
+              <p>No gaps found in the current chat history. Try again after more conversations.</p>
             </div>`;
           return;
         }
