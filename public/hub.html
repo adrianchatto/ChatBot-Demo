@@ -3,118 +3,235 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Chatbot Demo — chatoweb.com</title>
+  <title>Demo Hub — chattoweb</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0a0d14;
-      --card: #111520;
-      --border: #1e2438;
-      --accent: #4f8ef7;
-      --text: #e2e8f0;
-      --text-muted: #6b7a99;
-      --white: #ffffff;
-      --navy: #1B2B5E;
-      --gold: #C4A25A;
-      --green: #2D5016;
-      --gov-blue: #003078;
-    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #ffffff;
+      color: #0f172a;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
-    header {
-      padding: 18px 48px;
+    /* ── Nav ────────────────────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e2e8f0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
     }
-    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .logo-mark { width: 30px; height: 30px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: var(--white); }
-    .logo-text { font-size: 16px; font-weight: 700; color: var(--white); }
-    .logo-text span { color: var(--accent); }
-    .header-right { display: flex; align-items: center; gap: 20px; }
-    .nav-link { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
-    .nav-link:hover { color: var(--text); }
-    .logout-btn { color: var(--text-muted); font-size: 14px; text-decoration: none; }
-    .logout-btn:hover { color: var(--text); }
 
-    main { flex: 1; padding: 64px 48px; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .wordmark {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+    }
 
-    .page-eyebrow { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-    .page-title { font-size: 40px; font-weight: 800; color: var(--white); letter-spacing: -1px; margin-bottom: 10px; }
-    .page-desc { font-size: 16px; color: var(--text-muted); margin-bottom: 56px; line-height: 1.6; max-width: 560px; }
+    .wordmark span { color: #1e40af; }
 
-    .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-link {
+      font-size: 0.875rem;
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover { color: #0f172a; }
+
+    .signout-btn {
+      font-size: 0.875rem;
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 500;
+      border: 1px solid #e2e8f0;
+      padding: 7px 16px;
+      border-radius: 6px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .signout-btn:hover { border-color: #94a3b8; color: #0f172a; }
+
+    /* ── Page header ────────────────────────────────────────────────────────── */
+    .page-header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 56px 24px 40px;
+    }
+
+    .page-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #1e40af;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .page-header h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .page-header p {
+      font-size: 1rem;
+      color: #64748b;
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    /* ── Demo grid ──────────────────────────────────────────────────────────── */
+    .grid-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 56px;
+      flex: 1;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
 
     .demo-card {
-      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
       overflow: hidden;
       text-decoration: none;
-      color: var(--text);
-      transition: transform 0.2s, box-shadow 0.2s;
+      color: inherit;
+      transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
       display: flex;
       flex-direction: column;
+      background: #ffffff;
     }
-    .demo-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+
+    .demo-card:hover {
+      box-shadow: 0 8px 28px rgba(15,23,42,0.1);
+      transform: translateY(-2px);
+      border-color: #bfdbfe;
+    }
 
     .card-banner {
-      height: 160px;
+      height: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 64px;
+      font-size: 3rem;
       position: relative;
     }
-    .card-banner.legal { background: linear-gradient(135deg, #1B2B5E, #2d4a8a); }
-    .card-banner.retail { background: linear-gradient(135deg, #2D5016, #4a8a20); }
-    .card-banner.gov { background: linear-gradient(135deg, #003078, #1d70b8); }
 
-    .card-sector-label {
+    .card-banner.legal  { background: linear-gradient(135deg, #1B2B5E 0%, #2d4a8a 100%); }
+    .card-banner.retail { background: linear-gradient(135deg, #2D5016 0%, #4a8a20 100%); }
+    .card-banner.gov    { background: linear-gradient(135deg, #003078 0%, #1d70b8 100%); }
+
+    .sector-badge {
       position: absolute;
-      top: 12px; right: 12px;
-      font-size: 10px;
+      top: 12px;
+      right: 12px;
+      font-size: 0.6875rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.7);
-      background: rgba(0,0,0,0.3);
-      padding: 4px 10px;
+      color: rgba(255,255,255,0.85);
+      background: rgba(0,0,0,0.25);
+      padding: 3px 10px;
       border-radius: 20px;
     }
 
     .card-body {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-top: none;
       padding: 24px;
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
-    .card-body h3 { font-size: 19px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
-    .card-body p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
-    .card-features { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .card-features li { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
-    .card-features li::before { content: '✓'; color: var(--accent); font-weight: 700; }
+
+    .card-body h3 {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .card-body p {
+      font-size: 0.875rem;
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .card-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+    }
+
+    .card-features li {
+      font-size: 0.8125rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-features li::before {
+      content: '✓';
+      color: #16a34a;
+      font-weight: 700;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
     .card-cta {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       margin-top: 20px;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 700;
-      color: var(--accent);
+      color: #1e40af;
     }
 
+    /* ── Admin strip ────────────────────────────────────────────────────────── */
     .admin-strip {
-      margin-top: 56px;
-      background: var(--card);
-      border: 1px solid var(--border);
+      max-width: 1100px;
+      margin: 0 auto 56px;
+      padding: 0 24px;
+    }
+
+    .admin-strip-inner {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 20px 28px;
       display: flex;
@@ -123,60 +240,106 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-    .admin-strip-left { display: flex; align-items: center; gap: 14px; }
-    .admin-icon { font-size: 28px; }
-    .admin-strip h4 { font-size: 15px; font-weight: 700; color: var(--white); }
-    .admin-strip p { font-size: 13px; color: var(--text-muted); }
+
+    .admin-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .admin-icon {
+      font-size: 1.5rem;
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .admin-text h4 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .admin-text p {
+      font-size: 0.8125rem;
+      color: #64748b;
+    }
+
     .admin-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: #0f172a;
       text-decoration: none;
       padding: 10px 20px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 600;
-      transition: border-color 0.2s;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
     }
-    .admin-btn:hover { border-color: var(--accent); color: var(--accent); }
 
+    .admin-btn:hover {
+      border-color: #1e40af;
+      color: #1e40af;
+      box-shadow: 0 1px 4px rgba(30,64,175,0.1);
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────────────── */
     footer {
-      padding: 20px 48px;
-      border-top: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--text-muted);
+      border-top: 1px solid #e2e8f0;
+      padding: 24px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
       display: flex;
+      align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 8px;
     }
-    footer a { color: var(--text-muted); text-decoration: none; }
-    footer a:hover { color: var(--text); }
+
+    footer span { font-size: 0.8125rem; color: #94a3b8; }
+    footer a { font-size: 0.8125rem; color: #94a3b8; text-decoration: none; }
+    footer a:hover { color: #64748b; }
+
+    @media (max-width: 640px) {
+      .nav-link { display: none; }
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <a href="/" class="logo">
-      <div class="logo-mark">C</div>
-      <span class="logo-text">chato<span>web</span>.com</span>
-    </a>
-    <div class="header-right">
-      <a href="/" class="nav-link">← All demos</a>
-      <a href="/logout" class="logout-btn">Sign out</a>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="wordmark">chatto<span>web</span></a>
+      <div class="nav-right">
+        <a href="/" class="nav-link">← Home</a>
+        <a href="/logout" class="signout-btn">Sign out</a>
+      </div>
     </div>
-  </header>
+  </nav>
 
-  <main>
-    <p class="page-eyebrow">AI Chatbot Demo</p>
-    <h1 class="page-title">Choose a sector</h1>
-    <p class="page-desc">Each demo shows how a Claude-powered chatbot can be tailored to a specific industry, with its own knowledge base, persona, and visual identity.</p>
+  <div class="page-header">
+    <p class="page-eyebrow">Live Demo Platform</p>
+    <h1>Choose a sector</h1>
+    <p>Each demo shows how a Claude-powered chatbot can be tailored to a specific industry, with its own knowledge base, persona, and visual identity.</p>
+  </div>
 
+  <div class="grid-section">
     <div class="demo-grid">
 
       <a href="/chatbot/legal" class="demo-card">
         <div class="card-banner legal">
-          <span class="card-sector-label">Legal</span>
+          <span class="sector-badge">Legal</span>
           ⚖️
         </div>
         <div class="card-body">
@@ -194,7 +357,7 @@
 
       <a href="/chatbot/retail" class="demo-card">
         <div class="card-banner retail">
-          <span class="card-sector-label">Retail</span>
+          <span class="sector-badge">Retail</span>
           🌿
         </div>
         <div class="card-body">
@@ -212,7 +375,7 @@
 
       <a href="/chatbot/gov" class="demo-card">
         <div class="card-banner gov">
-          <span class="card-sector-label">Government</span>
+          <span class="sector-badge">Government</span>
           🏛️
         </div>
         <div class="card-body">
@@ -230,21 +393,25 @@
 
     </div>
 
-    <div class="admin-strip">
-      <div class="admin-strip-left">
-        <div class="admin-icon">⚙️</div>
-        <div>
-          <h4>Knowledge Base Manager</h4>
-          <p>Add, edit, or remove the information each chatbot can access. Changes take effect immediately.</p>
+    <div class="admin-strip" style="padding-left:0;padding-right:0;margin-top:24px;">
+      <div class="admin-strip-inner">
+        <div class="admin-left">
+          <div class="admin-icon">⚙️</div>
+          <div class="admin-text">
+            <h4>Knowledge Base Manager</h4>
+            <p>Add, edit, or remove the information each chatbot can access. Changes take effect immediately.</p>
+          </div>
         </div>
+        <a href="/admin" class="admin-btn">Open admin →</a>
       </div>
-      <a href="/admin" class="admin-btn">Open admin →</a>
     </div>
-  </main>
+  </div>
 
   <footer>
-    <span>© 2025 chatoweb.com — Powered by Claude</span>
-    <a href="/logout">Sign out</a>
+    <div class="footer-inner">
+      <span>© 2026 chattoweb.com</span>
+      <a href="/logout">Sign out</a>
+    </div>
   </footer>
 
 </body>
