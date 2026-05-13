@@ -327,6 +327,55 @@
     .toast.error { background: var(--red); }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
+    /* ── Guardrails ──────────────────────────────────────────────── */
+    .guardrails-panel { max-width: 700px; display: flex; flex-direction: column; gap: 20px; }
+    .guardrail-banner {
+      background: rgba(79,142,247,0.08); border: 1px solid rgba(79,142,247,0.25);
+      border-radius: 10px; padding: 16px 20px; font-size: 13px;
+      color: var(--text-muted); line-height: 1.6;
+    }
+    .guardrail-banner strong { color: var(--text); }
+    .guardrail-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px;
+    }
+    .guardrail-card h4 { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+    .guardrail-card .hint { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; }
+    .guardrail-card textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 14px; border-radius: 8px;
+      font-size: 13px; font-family: inherit; outline: none;
+      transition: border-color 0.15s; resize: vertical; min-height: 90px;
+    }
+    .guardrail-card textarea:focus { border-color: var(--accent); }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .toggle-label-group { flex: 1; }
+    .toggle-label-group h4 { margin-bottom: 4px; }
+    .toggle-label-group .hint { margin-bottom: 0; }
+    .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0; background: var(--border);
+      border-radius: 12px; cursor: pointer; transition: background 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-track::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; background: var(--white);
+      border-radius: 50%; transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-track::after { transform: translateX(20px); }
+    .guardrail-save-row { display: flex; align-items: center; gap: 16px; }
+    .btn-guardrail-save {
+      background: var(--accent); color: var(--white); border: none;
+      padding: 11px 28px; border-radius: 8px; font-size: 14px;
+      font-weight: 700; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-guardrail-save:hover { background: var(--accent-hover); }
+    .btn-guardrail-save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .save-status { font-size: 13px; color: var(--green); opacity: 0; transition: opacity 0.3s; }
+    .save-status.visible { opacity: 1; }
+
     /* ── Scrollbar ───────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -360,6 +409,7 @@
       <button class="tab-btn active" id="tab-kb" onclick="switchTab('kb')">Knowledge Base</button>
       <button class="tab-btn" id="tab-history" onclick="switchTab('history')">History</button>
       <button class="tab-btn" id="tab-recommendations" onclick="switchTab('recommendations')">Recommendations</button>
+      <button class="tab-btn" id="tab-guardrails" onclick="switchTab('guardrails')">Guardrails</button>
     </div>
 
     <div class="stats-row" id="stats-row" style="display:none">
@@ -491,6 +541,7 @@
       if (tab === 'kb') renderTableView();
       else if (tab === 'history') loadHistory();
       else if (tab === 'recommendations') renderRecommendationsView();
+      else if (tab === 'guardrails') loadGuardrails();
     }
 
     function renderTableView() {
@@ -817,6 +868,95 @@
       t.textContent = msg;
       t.className = `toast${isError ? ' error' : ''} show`;
       setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ── Guardrails ────────────────────────────────────────────────────
+    async function loadGuardrails() {
+      document.getElementById('table-header').style.display = 'none';
+      document.getElementById('table-container').innerHTML = '<div class="loading">Loading guardrails…</div>';
+
+      try {
+        const res = await fetch(`/api/guardrails/${currentSite}`);
+        const g = await res.json();
+        renderGuardrailsPanel(g);
+      } catch {
+        document.getElementById('table-container').innerHTML = `
+          <div class="empty-state">
+            <div class="icon">⚠️</div>
+            <h3>Could not load guardrails</h3>
+            <p>Please try again.</p>
+          </div>`;
+      }
+    }
+
+    function renderGuardrailsPanel(g) {
+      document.getElementById('table-container').innerHTML = `
+        <div class="guardrails-panel">
+          <div class="guardrail-banner">
+            <strong>What are guardrails?</strong> These rules are injected into the bot's system prompt on every conversation.
+            They constrain what topics the bot will discuss, define what it says when it declines, and optionally limit it
+            to only answering questions covered in the knowledge base.
+          </div>
+
+          <div class="guardrail-card">
+            <h4>Blocked topics</h4>
+            <p class="hint">Comma-separated list of topics the bot must never discuss, regardless of how the request is phrased.
+            Be specific — "competitor brands" is better than "competitors".</p>
+            <textarea id="gr-blocked" rows="4" placeholder="e.g. medical advice, competitor brands, cooking recipes">${esc(g.blocked_topics || '')}</textarea>
+          </div>
+
+          <div class="guardrail-card">
+            <h4>Off-topic reply</h4>
+            <p class="hint">Exact message the bot uses when it declines an out-of-scope request. Leave blank to use the bot's default phrasing.</p>
+            <textarea id="gr-reply" rows="3" placeholder="e.g. I can only assist with questions about our products and services. Please call us on…">${esc(g.off_topic_reply || '')}</textarea>
+          </div>
+
+          <div class="guardrail-card">
+            <div class="toggle-row">
+              <div class="toggle-label-group">
+                <h4>Strict knowledge base mode</h4>
+                <p class="hint">When on, the bot only answers questions explicitly covered in the knowledge base and declines everything else.
+                Recommended for public sector and regulated industries.</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="gr-strict" ${g.strict_kb_mode ? 'checked' : ''}>
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="guardrail-save-row">
+            <button class="btn-guardrail-save" onclick="saveGuardrails()">Save guardrails</button>
+            <span class="save-status" id="save-status">✓ Saved</span>
+          </div>
+        </div>`;
+    }
+
+    async function saveGuardrails() {
+      const btn = document.querySelector('.btn-guardrail-save');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const res = await fetch(`/api/guardrails/${currentSite}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            blocked_topics: document.getElementById('gr-blocked').value.trim(),
+            off_topic_reply: document.getElementById('gr-reply').value.trim(),
+            strict_kb_mode: document.getElementById('gr-strict').checked
+          })
+        });
+        if (!res.ok) throw new Error('Save failed');
+        const status = document.getElementById('save-status');
+        status.classList.add('visible');
+        setTimeout(() => status.classList.remove('visible'), 2500);
+      } catch {
+        showToast('Failed to save guardrails. Please try again.', true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save guardrails';
+      }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────

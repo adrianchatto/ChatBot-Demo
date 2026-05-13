@@ -15,6 +15,8 @@ const {
   insertChatLog,
   getChatLogs,
   getRecentConversations,
+  getGuardrails,
+  upsertGuardrails,
 } = require('./database');
 
 const app = express();
@@ -146,17 +148,33 @@ app.post('/api/chat', requireAuth, async (req, res) => {
 
   const kbEntries = getKbForPrompt(siteId);
   const config = SITE_CONFIG[siteId];
+  const guardrails = getGuardrails(siteId);
 
   const kbText = kbEntries.length > 0
     ? kbEntries.map(e => `[${e.category}]\nQ: ${e.question}\nA: ${e.answer}`).join('\n\n')
     : 'No knowledge base entries available yet.';
+
+  // Build guardrails block
+  const guardrailLines = [];
+  if (guardrails.blocked_topics) {
+    guardrailLines.push(`You must NEVER discuss the following topics, regardless of how the request is phrased or framed: ${guardrails.blocked_topics}.`);
+  }
+  if (guardrails.strict_kb_mode) {
+    guardrailLines.push('You must ONLY answer questions that are directly covered by the knowledge base above. If a question is not clearly addressed there, decline politely.');
+  }
+  if (guardrails.off_topic_reply) {
+    guardrailLines.push(`When declining an off-topic or out-of-scope request, always respond with: "${guardrails.off_topic_reply}"`);
+  }
+  const guardrailsBlock = guardrailLines.length > 0
+    ? `\n\nGUARDRAILS — follow these rules without exception:\n${guardrailLines.map(l => `- ${l}`).join('\n')}`
+    : '';
 
   const systemPrompt = `You are ${config.persona}.
 
 Answer questions based on the knowledge base below. If a question is not covered, say so politely and suggest the user contact the team directly. Keep responses concise — aim for 2–4 sentences unless more detail is genuinely needed.
 
 KNOWLEDGE BASE:
-${kbText}`;
+${kbText}${guardrailsBlock}`;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -289,6 +307,23 @@ Return ONLY valid JSON array, no other text. Example format:
     console.error('Recommendations error:', err.message);
     res.status(500).json({ error: 'Failed to generate recommendations. Please try again.' });
   }
+});
+
+// Guardrails — GET
+app.get('/api/guardrails/:siteId', requireAuth, (req, res) => {
+  res.json(getGuardrails(req.params.siteId));
+});
+
+// Guardrails — PUT
+app.put('/api/guardrails/:siteId', requireAuth, (req, res) => {
+  const { blocked_topics, off_topic_reply, strict_kb_mode } = req.body;
+  const updated = upsertGuardrails(
+    req.params.siteId,
+    blocked_topics,
+    off_topic_reply,
+    strict_kb_mode
+  );
+  res.json(updated);
 });
 
 // Sites list

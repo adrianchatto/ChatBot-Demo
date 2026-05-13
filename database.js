@@ -61,6 +61,17 @@ function seedDatabase() {
     )
   `);
 
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS guardrails (
+      id               INTEGER PRIMARY KEY AUTOINCREMENT,
+      site_id          TEXT    NOT NULL UNIQUE,
+      blocked_topics   TEXT    DEFAULT '',
+      off_topic_reply  TEXT    DEFAULT '',
+      strict_kb_mode   INTEGER DEFAULT 0,
+      updated_at       DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   const count = database.prepare('SELECT COUNT(*) as count FROM knowledge_base').get();
   if (count.count > 0) return;
 
@@ -113,6 +124,32 @@ function seedDatabase() {
   });
 
   seed();
+
+  // Seed guardrails defaults (INSERT OR IGNORE so existing configs are preserved)
+  const insertGuardrail = database.prepare(`
+    INSERT OR IGNORE INTO guardrails (site_id, blocked_topics, off_topic_reply, strict_kb_mode)
+    VALUES (?, ?, ?, ?)
+  `);
+
+  insertGuardrail.run(
+    'legal',
+    'medical advice, financial investment advice, competitor law firms, predictions on legal outcomes, immigration advice',
+    "I'm only able to assist with legal enquiries for Harrington & Associates. For anything outside that scope, please call us on 020 7946 0000 or email info@harringtonlaw.co.uk.",
+    0
+  );
+  insertGuardrail.run(
+    'retail',
+    'competitor brands and products, medical or health claims, cooking and recipes, political topics, anything unrelated to Botanica Home',
+    "I can only help with questions about Botanica Home products, orders, delivery, and returns. Is there something I can help you with today?",
+    0
+  );
+  insertGuardrail.run(
+    'gov',
+    'political party opinions, party politics, immigration advice, medical advice, legal advice, personal financial advice, benefit eligibility decisions',
+    "I can only assist with Northgate District Council services. For other queries, please visit our website or call 01632 960000.",
+    1
+  );
+
   console.log('Database seeded with demo data.');
 }
 
@@ -174,6 +211,27 @@ function getRecentConversations(siteId, limit = 50) {
     .all(siteId, limit);
 }
 
+// ── Guardrails ────────────────────────────────────────────────────────────────
+
+function getGuardrails(siteId) {
+  return getDb()
+    .prepare('SELECT * FROM guardrails WHERE site_id = ?')
+    .get(siteId) || { site_id: siteId, blocked_topics: '', off_topic_reply: '', strict_kb_mode: 0 };
+}
+
+function upsertGuardrails(siteId, blockedTopics, offTopicReply, strictKbMode) {
+  getDb().prepare(`
+    INSERT INTO guardrails (site_id, blocked_topics, off_topic_reply, strict_kb_mode, updated_at)
+    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(site_id) DO UPDATE SET
+      blocked_topics  = excluded.blocked_topics,
+      off_topic_reply = excluded.off_topic_reply,
+      strict_kb_mode  = excluded.strict_kb_mode,
+      updated_at      = CURRENT_TIMESTAMP
+  `).run(siteId, blockedTopics || '', offTopicReply || '', strictKbMode ? 1 : 0);
+  return getGuardrails(siteId);
+}
+
 // ── Test helpers ──────────────────────────────────────────────────────────────
 
 function resetDb() {
@@ -198,4 +256,7 @@ module.exports = {
   insertChatLog,
   getChatLogs,
   getRecentConversations,
+  // Guardrails
+  getGuardrails,
+  upsertGuardrails,
 };
