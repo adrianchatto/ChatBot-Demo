@@ -4,7 +4,18 @@ const session = require('express-session');
 const path = require('path');
 const cors = require('cors');
 const Anthropic = require('@anthropic-ai/sdk');
-const { getDb, seedDatabase } = require('./database');
+const {
+  seedDatabase,
+  getKbForPrompt,
+  getKbEntries,
+  getKbQuestions,
+  insertKbEntry,
+  updateKbEntry,
+  deleteKbEntry,
+  insertChatLog,
+  getChatLogs,
+  getRecentConversations,
+} = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -133,11 +144,7 @@ app.post('/api/chat', requireAuth, async (req, res) => {
 
   chatRequestCount++;
 
-  const db = getDb();
-  const kbEntries = db
-    .prepare('SELECT category, question, answer FROM knowledge_base WHERE site_id = ? ORDER BY category')
-    .all(siteId);
-
+  const kbEntries = getKbForPrompt(siteId);
   const config = SITE_CONFIG[siteId];
 
   const kbText = kbEntries.length > 0
@@ -176,9 +183,7 @@ ${kbText}`;
     // Log the conversation (non-fatal)
     try {
       const userMessage = Array.isArray(messages) ? (messages[messages.length - 1]?.content || '') : '';
-      getDb().prepare(
-        'INSERT INTO chat_logs (site_id, session_id, user_message, bot_response) VALUES (?, ?, ?, ?)'
-      ).run(siteId, req.session?.id || '', userMessage, fullBotResponse);
+      insertChatLog(siteId, req.session?.id || '', userMessage, fullBotResponse);
     } catch (logErr) {
       console.error('Chat log error:', logErr.message);
     }
@@ -194,11 +199,7 @@ ${kbText}`;
 
 // Knowledge base — GET
 app.get('/api/kb/:siteId', requireAuth, (req, res) => {
-  const db = getDb();
-  const entries = db
-    .prepare('SELECT * FROM knowledge_base WHERE site_id = ? ORDER BY category, id')
-    .all(req.params.siteId);
-  res.json(entries);
+  res.json(getKbEntries(req.params.siteId));
 });
 
 // Knowledge base — POST
@@ -207,12 +208,7 @@ app.post('/api/kb', requireAuth, (req, res) => {
   if (!site_id || !question || !answer) {
     return res.status(400).json({ error: 'site_id, question and answer are required.' });
   }
-  const db = getDb();
-  const result = db
-    .prepare('INSERT INTO knowledge_base (site_id, category, question, answer) VALUES (?, ?, ?, ?)')
-    .run(site_id, category || '', question, answer);
-  const entry = db.prepare('SELECT * FROM knowledge_base WHERE id = ?').get(result.lastInsertRowid);
-  res.json(entry);
+  res.json(insertKbEntry(site_id, category, question, answer));
 });
 
 // Knowledge base — PUT
@@ -221,35 +217,23 @@ app.put('/api/kb/:id', requireAuth, (req, res) => {
   if (!question || !answer) {
     return res.status(400).json({ error: 'question and answer are required.' });
   }
-  const db = getDb();
-  db.prepare('UPDATE knowledge_base SET category = ?, question = ?, answer = ? WHERE id = ?')
-    .run(category || '', question, answer, req.params.id);
-  const entry = db.prepare('SELECT * FROM knowledge_base WHERE id = ?').get(req.params.id);
-  res.json(entry);
+  res.json(updateKbEntry(req.params.id, category, question, answer));
 });
 
 // Knowledge base — DELETE
 app.delete('/api/kb/:id', requireAuth, (req, res) => {
-  const db = getDb();
-  db.prepare('DELETE FROM knowledge_base WHERE id = ?').run(req.params.id);
+  deleteKbEntry(req.params.id);
   res.json({ success: true });
 });
 
 // Chat logs — GET
 app.get('/api/logs/:siteId', requireAuth, (req, res) => {
-  const db = getDb();
-  const logs = db
-    .prepare('SELECT id, site_id, user_message, bot_response, created_at FROM chat_logs WHERE site_id = ? ORDER BY created_at DESC LIMIT 100')
-    .all(req.params.siteId);
-  res.json(logs);
+  res.json(getChatLogs(req.params.siteId));
 });
 
 // Recommendations — GET
 app.get('/api/recommendations/:siteId', requireAuth, async (req, res) => {
-  const db = getDb();
-  const logs = db
-    .prepare('SELECT user_message, bot_response FROM chat_logs WHERE site_id = ? ORDER BY created_at DESC LIMIT 50')
-    .all(req.params.siteId);
+  const logs = getRecentConversations(req.params.siteId);
 
   if (logs.length === 0) {
     return res.json({ recommendations: [], message: 'No chat history yet. Recommendations appear once users have started chatting.' });
@@ -259,9 +243,7 @@ app.get('/api/recommendations/:siteId', requireAuth, async (req, res) => {
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY is not set.' });
   }
 
-  const kb = db
-    .prepare('SELECT question FROM knowledge_base WHERE site_id = ?')
-    .all(req.params.siteId);
+  const kb = getKbQuestions(req.params.siteId);
 
   const logsText = logs.map(l => `User: ${l.user_message}\nBot: ${l.bot_response}`).join('\n---\n');
   const kbText = kb.map(e => `- ${e.question}`).join('\n');

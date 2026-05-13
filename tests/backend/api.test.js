@@ -12,7 +12,7 @@
 
 let mockEntries = [];
 let mockChatLogs = [];
-let nextId = 100;
+let mockNextId = 100;
 
 function makeMockStatement(sql) {
   if (sql.includes('chat_logs')) {
@@ -21,7 +21,7 @@ function makeMockStatement(sql) {
       get: jest.fn(() => null),
       run: jest.fn((...args) => {
         if (sql.includes('INSERT')) {
-          const id = ++nextId;
+          const id = ++mockNextId;
           const [site_id, session_id, user_message, bot_response] = args;
           mockChatLogs.push({ id, site_id, session_id: session_id || '', user_message, bot_response, created_at: new Date().toISOString() });
           return { lastInsertRowid: id };
@@ -39,7 +39,7 @@ function makeMockStatement(sql) {
     ),
     run: jest.fn((...args) => {
       if (sql.includes('INSERT')) {
-        const id = ++nextId;
+        const id = ++mockNextId;
         const [site_id, category, question, answer] = args;
         mockEntries.push({ id, site_id, category: category || '', question, answer, created_at: new Date().toISOString() });
         return { lastInsertRowid: id };
@@ -62,9 +62,43 @@ function makeMockStatement(sql) {
 const mockDb = { prepare: jest.fn((sql) => makeMockStatement(sql)) };
 
 jest.mock('../../database', () => ({
-  getDb: jest.fn(() => mockDb),
   seedDatabase: jest.fn(),
-  resetDb: jest.fn()
+  resetDb: jest.fn(),
+
+  getKbEntries: jest.fn((siteId) =>
+    mockEntries.filter(e => e.site_id === siteId)
+  ),
+  getKbForPrompt: jest.fn((siteId) =>
+    mockEntries.filter(e => e.site_id === siteId)
+  ),
+  getKbQuestions: jest.fn((siteId) =>
+    mockEntries.filter(e => e.site_id === siteId).map(e => ({ question: e.question }))
+  ),
+  insertKbEntry: jest.fn((siteId, category, question, answer) => {
+    const id = ++mockNextId;
+    const entry = { id, site_id: siteId, category: category || '', question, answer, created_at: new Date().toISOString() };
+    mockEntries.push(entry);
+    return entry;
+  }),
+  updateKbEntry: jest.fn((id, category, question, answer) => {
+    const idx = mockEntries.findIndex(e => e.id === Number(id));
+    if (idx >= 0) mockEntries[idx] = { ...mockEntries[idx], category: category || '', question, answer };
+    return mockEntries[idx] || null;
+  }),
+  deleteKbEntry: jest.fn((id) => {
+    mockEntries = mockEntries.filter(e => e.id !== Number(id));
+  }),
+
+  insertChatLog: jest.fn((siteId, sessionId, userMessage, botResponse) => {
+    const id = ++mockNextId;
+    mockChatLogs.push({ id, site_id: siteId, session_id: sessionId || '', user_message: userMessage, bot_response: botResponse, created_at: new Date().toISOString() });
+  }),
+  getChatLogs: jest.fn((siteId) =>
+    mockChatLogs.filter(l => l.site_id === siteId)
+  ),
+  getRecentConversations: jest.fn((siteId) =>
+    mockChatLogs.filter(l => l.site_id === siteId).map(l => ({ user_message: l.user_message, bot_response: l.bot_response }))
+  ),
 }));
 
 // ── Load app after mock is registered ─────────────────────────────────────────
@@ -80,7 +114,7 @@ beforeEach(() => {
     { id: 4, site_id: 'gov',    category: 'Council Tax',     question: 'How do I pay?',     answer: 'Online, phone, or post office.',         created_at: '2025-01-01' }
   ];
   mockChatLogs = [];
-  nextId = 100;
+  mockNextId = 100;
   mockDb.prepare.mockImplementation((sql) => makeMockStatement(sql));
 });
 

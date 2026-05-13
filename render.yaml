@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: ChatBot-Demo
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Points the app at the persistent disk — survives all deploys and restarts.
+      # Change this to a DATABASE_URL when migrating to Azure Postgres / Azure SQL.
+      - key: DB_PATH
+        value: /var/data/chatbot.db
+      # Set these in the Render dashboard — do not commit real values here.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DEMO_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+    disk:
+      name: chatbot-data
+      mountPath: /var/data
+      sizeGB: 1
