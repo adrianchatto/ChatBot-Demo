@@ -121,6 +121,37 @@ function seedDatabase() {
       'Report potholes and road defects using the Report It tool on our website, or call 01632 961000. Include the exact location — postcode or nearest landmark — and a description of the problem. We aim to inspect all reports within 3 working days. Safety-critical defects are repaired within 24 hours. You will receive a reference number by email to track the status of your report online.');
     insert.run('gov', 'Housing & Benefits', 'How do I apply for housing benefit?',
       'If you are of working age, housing costs are covered through Universal Credit, administered by the DWP — not the council. Apply at gov.uk/universal-credit. If you are pension age, you may be eligible for Housing Benefit from us. Apply online via our website or call our Benefits team on 01632 960100, Monday to Friday 9am–5pm. Have proof of identity, your tenancy agreement, and income details to hand before calling.');
+    // ── ACCOUNTING: Hadley Advisory ───────────────────────────────────────────
+    insert.run('hadley', 'Services', 'What services does Hadley Advisory offer?',
+      'Hadley Advisory provides a full range of accountancy services including: statutory accounts preparation, corporation tax and self-assessment returns, VAT registration and returns, bookkeeping and management accounts, payroll administration, business advisory and financial planning. We work with sole traders, partnerships, limited companies, and not-for-profit organisations. Book a free initial consultation to discuss what you need.');
+    insert.run('hadley', 'Services', 'Do you work with small businesses and sole traders?',
+      'Yes — the majority of our clients are small and medium-sized businesses, sole traders, and freelancers. We understand the pressures of running your own business and offer straightforward, jargon-free advice. We have fixed-fee packages designed specifically for smaller businesses, with no unexpected bills. Get in touch to find out which package suits you.');
+    insert.run('hadley', 'Services', 'Can you help me set up a new limited company?',
+      'Yes. We can handle Companies House incorporation, register you for Corporation Tax with HMRC, set up your bookkeeping software, and advise on the most tax-efficient structure from day one. Many clients find it saves significant money and time to get this right at the start. Call us on 020 3456 7890 or email hello@hadleyadvisory.co.uk to get started.');
+    insert.run('hadley', 'Tax', 'When is my corporation tax due?',
+      'Corporation tax is due nine months and one day after your company\'s accounting year end. For example, if your year ends 31 March, payment is due by 1 January the following year. Your tax return must be filed with HMRC within 12 months of the year end. We handle the calculation, filing, and can set up a payment reminder so you are never caught out.');
+    insert.run('hadley', 'Tax', 'Do you complete self-assessment tax returns?',
+      'Yes. We prepare and file self-assessment returns for directors, sole traders, landlords, and individuals with complex income (investments, overseas income, etc.). We gather your figures, prepare the return, check it for accuracy, and file it with HMRC — all you need to do is review and approve. Avoid the January rush by getting in touch early; we work on a first-come, first-served basis each year.');
+    insert.run('hadley', 'Tax', 'What is Making Tax Digital and does it affect me?',
+      'Making Tax Digital (MTD) is HMRC\'s programme to move tax records and submissions online. MTD for VAT is already mandatory for all VAT-registered businesses. MTD for Income Tax (MTD ITSA) will apply to sole traders and landlords with income over £50,000 from April 2026, and over £30,000 from April 2027. We can set you up with compliant software and handle submissions on your behalf — contact us if you\'re unsure whether you\'re affected.');
+    insert.run('hadley', 'Tax', 'How can I reduce my tax bill legally?',
+      'There are a number of legitimate ways to reduce your tax liability depending on your situation — pension contributions, allowable business expenses, timing of dividends, use of ISA allowances, and more. We review tax efficiency as a standard part of our annual accounts process. For tailored planning, book a tax advisory consultation. We never recommend schemes that carry HMRC risk — only straightforward, compliant planning.');
+    insert.run('hadley', 'Bookkeeping', 'Do you offer bookkeeping services?',
+      'Yes. We offer monthly and quarterly bookkeeping using cloud software including Xero, QuickBooks, and FreeAgent. Our bookkeeping service includes bank reconciliation, purchase and sales ledger maintenance, and management account preparation. We can work alongside your existing staff or take on the full function. Accurate, up-to-date books also mean your year-end accounts cost less to prepare.');
+    insert.run('hadley', 'Bookkeeping', 'Which accounting software do you use?',
+      'We work primarily with Xero, QuickBooks Online, and FreeAgent. All three are HMRC-recognised for Making Tax Digital. We can advise on the best fit for your business size and sector, handle the setup and migration, and provide training for you or your team. We are a Xero Certified Advisor and QuickBooks ProAdvisor.');
+    insert.run('hadley', 'Fees', 'How much do you charge?',
+      'We offer transparent fixed-fee packages rather than hourly billing, so you always know what to expect. Sole trader packages start from £75 per month; limited company packages from £150 per month. These typically include annual accounts, tax return, and quarterly check-ins. More complex requirements are priced individually. Book a free 30-minute consultation and we\'ll give you a written quote with no obligation.');
+    insert.run('hadley', 'Fees', 'Is there a free initial consultation?',
+      'Yes — we offer a free 30-minute introductory call for all new enquiries. This gives us a chance to understand your situation and for you to ask any questions before committing. There is no pressure and no obligation. You can book via our website or call 020 3456 7890 Monday to Friday, 9am–5:30pm.');
+    insert.run('hadley', 'Switching', 'How do I switch to Hadley Advisory from my current accountant?',
+      'Switching is straightforward and we handle the process for you. Once you instruct us, we contact your previous accountant professionally to request your records and obtain a clearance letter. There is nothing for you to do except sign an authority letter. The whole handover typically takes two to three weeks. Many clients are surprised by how easy it is — we do it every week.');
+    insert.run('hadley', 'Records', 'What financial records do I need to keep and for how long?',
+      'HMRC requires most businesses to keep financial records for at least six years from the end of the accounting period they relate to. This includes invoices, receipts, bank statements, payroll records, and VAT records. For companies, certain records must be kept for the company\'s lifetime. We recommend cloud-based storage — if you use our bookkeeping service, your records are automatically retained and organised.');
+    insert.run('hadley', 'Payroll', 'Can you run my payroll?',
+      'Yes. We offer a fully managed payroll service for businesses with one to 200 employees. This includes calculating PAYE and National Insurance, producing payslips, submitting Real Time Information (RTI) returns to HMRC, and administering pension contributions under auto-enrolment. We handle all the filing deadlines so you never face HMRC penalties. Contact us for a payroll-only quote.');
+    insert.run('hadley', 'Contact', 'How do I contact Hadley Advisory?',
+      'You can reach us by phone on 020 3456 7890, Monday to Friday 9am–5:30pm. Email us any time at hello@hadleyadvisory.co.uk. Our office is at 14 Finsbury Square, London, EC2A 1AQ. For new enquiries, the quickest route is our website contact form — we aim to respond within one working day. We also offer video meetings if you prefer not to come in person.');
   });
 
   seed();
@@ -148,6 +179,12 @@ function seedDatabase() {
     'political party opinions, party politics, immigration advice, medical advice, legal advice, personal financial advice, benefit eligibility decisions',
     "I can only assist with Northgate District Council services. For other queries, please visit our website or call 01632 960000.",
     1
+  );
+  insertGuardrail.run(
+    'hadley',
+    'competitor accountancy firms, specific tax avoidance schemes, HMRC penalties already incurred (direct to HMRC or a tax specialist), legal disputes, medical advice, investment advice',
+    "I can help with general accountancy and tax questions for Hadley Advisory. For anything specific to your situation, please book a free consultation — we are happy to help. Call 020 3456 7890 or email hello@hadleyadvisory.co.uk.",
+    0
   );
 
   console.log('Database seeded with demo data.');

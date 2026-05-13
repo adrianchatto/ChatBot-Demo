@@ -47,6 +47,10 @@ const SITE_CONFIG = {
   gov: {
     name: 'Northgate District Council',
     persona: 'a clear and helpful council services assistant for Northgate District Council. Be factual, concise, and direct. Always signpost to the correct team or phone number when relevant.'
+  },
+  hadley: {
+    name: 'Hadley Advisory',
+    persona: 'a knowledgeable and professional assistant for Hadley Advisory, a UK chartered accountancy firm. Be warm, clear, and reassuring — accountancy can feel daunting so put clients at ease. Always recommend booking a free initial consultation for anything complex or specific to the client\'s situation. Never give definitive tax or legal advice; instead explain options and direct to the team.'
   }
 };
 
@@ -122,8 +126,8 @@ app.get('/chatbot', requireAuth, (req, res) => {
 
 // ── Protected API routes ──────────────────────────────────────────────────────
 
-// Chat endpoint (streaming SSE)
-app.post('/api/chat', requireAuth, async (req, res) => {
+// Chat endpoint (streaming SSE) — public so the widget works on external sites
+app.post('/api/chat', async (req, res) => {
   const { siteId, messages } = req.body;
 
   if (!siteId || !messages || !SITE_CONFIG[siteId]) {
