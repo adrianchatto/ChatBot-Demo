@@ -29,6 +29,21 @@ let chatRequestCount = 0;
 app._setChatCount   = (n) => { chatRequestCount = n; };
 app._resetChatCount = ()  => { chatRequestCount = 0; };
 
+// ── Per-site rate limiter ─────────────────────────────────────────────────────
+// In-memory rolling window (resets on server restart). Each entry tracks the
+// number of requests in the current 60-second window and when that window ends.
+const siteRateLimits = {};
+
+function checkSiteRateLimit(siteId, limitRpm) {
+  if (!limitRpm || limitRpm <= 0) return false; // 0 = unlimited
+  const now = Date.now();
+  if (!siteRateLimits[siteId] || now > siteRateLimits[siteId].resetAt) {
+    siteRateLimits[siteId] = { count: 0, resetAt: now + 60_000 };
+  }
+  siteRateLimits[siteId].count++;
+  return siteRateLimits[siteId].count > limitRpm;
+}
+
 // ── Anthropic client ──────────────────────────────────────────────────────────
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || ''
@@ -151,11 +166,18 @@ app.post('/api/chat', async (req, res) => {
     });
   }
 
-  chatRequestCount++;
-
   const kbEntries = getKbForPrompt(siteId);
   const config = SITE_CONFIG[siteId];
   const guardrails = getGuardrails(siteId);
+
+  // Per-site rate limit (requests per minute, configured in admin)
+  if (checkSiteRateLimit(siteId, guardrails.rate_limit_rpm)) {
+    return res.status(429).json({
+      error: 'Too many requests. Please wait a moment before trying again.'
+    });
+  }
+
+  chatRequestCount++;
 
   const kbText = kbEntries.length > 0
     ? kbEntries.map(e => `[${e.category}]\nQ: ${e.question}\nA: ${e.answer}`).join('\n\n')
@@ -192,7 +214,7 @@ ${kbText}${guardrailsBlock}`;
 
   try {
     const stream = anthropic.messages.stream({
-      model: process.env.MODEL || 'claude-haiku-4-5-20251001',
+      model: guardrails.model || process.env.MODEL || 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
       system: systemPrompt,
       messages
@@ -323,12 +345,14 @@ app.get('/api/guardrails/:siteId', requireAuth, (req, res) => {
 
 // Guardrails — PUT
 app.put('/api/guardrails/:siteId', requireAuth, (req, res) => {
-  const { blocked_topics, off_topic_reply, strict_kb_mode } = req.body;
+  const { blocked_topics, off_topic_reply, strict_kb_mode, model, rate_limit_rpm } = req.body;
   const updated = upsertGuardrails(
     req.params.siteId,
     blocked_topics,
     off_topic_reply,
-    strict_kb_mode
+    strict_kb_mode,
+    model,
+    rate_limit_rpm
   );
   res.json(updated);
 });

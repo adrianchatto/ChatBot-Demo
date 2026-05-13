@@ -68,9 +68,16 @@ function seedDatabase() {
       blocked_topics   TEXT    DEFAULT '',
       off_topic_reply  TEXT    DEFAULT '',
       strict_kb_mode   INTEGER DEFAULT 0,
+      model            TEXT    DEFAULT 'claude-haiku-4-5-20251001',
+      rate_limit_rpm   INTEGER DEFAULT 0,
       updated_at       DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Migrate existing tables — add columns if they don't exist yet
+  ['model TEXT DEFAULT \'claude-haiku-4-5-20251001\'', 'rate_limit_rpm INTEGER DEFAULT 0'].forEach(col => {
+    try { database.exec(`ALTER TABLE guardrails ADD COLUMN ${col}`); } catch (_) {}
+  });
 
   const count = database.prepare('SELECT COUNT(*) as count FROM knowledge_base').get();
   if (count.count > 0) return;
@@ -253,19 +260,34 @@ function getRecentConversations(siteId, limit = 50) {
 function getGuardrails(siteId) {
   return getDb()
     .prepare('SELECT * FROM guardrails WHERE site_id = ?')
-    .get(siteId) || { site_id: siteId, blocked_topics: '', off_topic_reply: '', strict_kb_mode: 0 };
+    .get(siteId) || {
+      site_id: siteId,
+      blocked_topics: '',
+      off_topic_reply: '',
+      strict_kb_mode: 0,
+      model: 'claude-haiku-4-5-20251001',
+      rate_limit_rpm: 0
+    };
 }
 
-function upsertGuardrails(siteId, blockedTopics, offTopicReply, strictKbMode) {
+function upsertGuardrails(siteId, blockedTopics, offTopicReply, strictKbMode, model, rateLimitRpm) {
+  const safeModel = [
+    'claude-haiku-4-5-20251001',
+    'claude-sonnet-4-6',
+    'claude-opus-4-6'
+  ].includes(model) ? model : 'claude-haiku-4-5-20251001';
+
   getDb().prepare(`
-    INSERT INTO guardrails (site_id, blocked_topics, off_topic_reply, strict_kb_mode, updated_at)
-    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    INSERT INTO guardrails (site_id, blocked_topics, off_topic_reply, strict_kb_mode, model, rate_limit_rpm, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(site_id) DO UPDATE SET
       blocked_topics  = excluded.blocked_topics,
       off_topic_reply = excluded.off_topic_reply,
       strict_kb_mode  = excluded.strict_kb_mode,
+      model           = excluded.model,
+      rate_limit_rpm  = excluded.rate_limit_rpm,
       updated_at      = CURRENT_TIMESTAMP
-  `).run(siteId, blockedTopics || '', offTopicReply || '', strictKbMode ? 1 : 0);
+  `).run(siteId, blockedTopics || '', offTopicReply || '', strictKbMode ? 1 : 0, safeModel, parseInt(rateLimitRpm, 10) || 0);
   return getGuardrails(siteId);
 }
 

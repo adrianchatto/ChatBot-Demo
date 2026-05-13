@@ -925,6 +925,25 @@
             </div>
           </div>
 
+          <div class="guardrail-card">
+            <h4>AI model</h4>
+            <p class="hint">Model used for this site's conversations. Haiku is fast and cost-efficient — recommended for most deployments.
+            Sonnet offers stronger reasoning. Opus is the most capable but significantly more expensive.</p>
+            <select id="gr-model" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit;">
+              <option value="claude-haiku-4-5-20251001" ${(g.model || 'claude-haiku-4-5-20251001') === 'claude-haiku-4-5-20251001' ? 'selected' : ''}>Claude Haiku — fast &amp; cost-efficient (recommended)</option>
+              <option value="claude-sonnet-4-6" ${g.model === 'claude-sonnet-4-6' ? 'selected' : ''}>Claude Sonnet — balanced capability</option>
+              <option value="claude-opus-4-6" ${g.model === 'claude-opus-4-6' ? 'selected' : ''}>Claude Opus — most capable</option>
+            </select>
+          </div>
+
+          <div class="guardrail-card">
+            <h4>Rate limit (requests per minute)</h4>
+            <p class="hint">Maximum number of chat requests this site can make per minute. Protects against runaway API costs if the widget
+            gets heavy traffic or is abused. Set to 0 to disable.</p>
+            <input type="number" id="gr-rpm" min="0" max="9999" value="${g.rate_limit_rpm || 0}"
+              style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit;">
+          </div>
+
           <div class="guardrail-save-row">
             <button class="btn-guardrail-save" onclick="saveGuardrails()">Save guardrails</button>
             <span class="save-status" id="save-status">✓ Saved</span>
@@ -944,7 +963,9 @@
           body: JSON.stringify({
             blocked_topics: document.getElementById('gr-blocked').value.trim(),
             off_topic_reply: document.getElementById('gr-reply').value.trim(),
-            strict_kb_mode: document.getElementById('gr-strict').checked
+            strict_kb_mode: document.getElementById('gr-strict').checked,
+            model: document.getElementById('gr-model').value,
+            rate_limit_rpm: parseInt(document.getElementById('gr-rpm').value, 10) || 0
           })
         });
         if (!res.ok) throw new Error('Save failed');
