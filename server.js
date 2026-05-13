@@ -82,6 +82,9 @@ function requireAuth(req, res, next) {
   res.redirect('/login');
 }
 
+// ── Public static assets (widget.js, etc.) ───────────────────────────────────
+app.use(express.static(path.join(__dirname, 'public')));
+
 // ── Public routes ─────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/landing.html'));
