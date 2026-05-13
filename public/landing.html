@@ -63,69 +63,95 @@
 
     /* ── Hero ───────────────────────────────────────────────────────────────── */
     .hero {
+      position: relative;
+      width: 100%;
+      min-height: 92vh;
+      background-image: url('https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=2000&auto=format&fit=crop&q=80');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        rgba(8, 14, 44, 0.88) 0%,
+        rgba(8, 14, 44, 0.70) 55%,
+        rgba(8, 14, 44, 0.45) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 88px 24px 72px;
+      padding: 88px 24px 80px;
+      width: 100%;
     }
 
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #eff6ff;
-      color: #1e40af;
-      border: 1px solid #bfdbfe;
+      background: rgba(255, 255, 255, 0.12);
+      color: #bfdbfe;
+      border: 1px solid rgba(191, 219, 254, 0.35);
       border-radius: 100px;
       padding: 5px 14px;
       font-size: 0.8rem;
       font-weight: 600;
       margin-bottom: 28px;
       letter-spacing: 0.01em;
+      backdrop-filter: blur(4px);
     }
 
     .hero-eyebrow::before {
       content: '';
       width: 6px;
       height: 6px;
-      background: #3b82f6;
+      background: #60a5fa;
       border-radius: 50%;
       flex-shrink: 0;
     }
 
-    .hero h1 {
-      font-size: clamp(2.25rem, 5vw, 3.5rem);
+    .hero-content h1 {
+      font-size: clamp(2.4rem, 5.5vw, 3.75rem);
       font-weight: 800;
-      line-height: 1.1;
+      line-height: 1.08;
       letter-spacing: -0.03em;
-      color: #0f172a;
-      max-width: 680px;
+      color: #ffffff;
+      max-width: 720px;
       margin-bottom: 24px;
     }
 
-    .hero h1 em {
+    .hero-content h1 em {
       font-style: normal;
-      color: #1e40af;
+      color: #93c5fd;
     }
 
-    .hero p {
-      font-size: 1.1rem;
-      color: #64748b;
-      max-width: 500px;
-      margin-bottom: 40px;
+    .hero-content p {
+      font-size: 1.125rem;
+      color: rgba(255, 255, 255, 0.75);
+      max-width: 520px;
+      margin-bottom: 44px;
       line-height: 1.75;
     }
 
     .hero-actions {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
     .btn-primary {
-      background: #1e40af;
+      background: #2563eb;
       color: #fff;
-      padding: 12px 28px;
+      padding: 13px 30px;
       border-radius: 8px;
       font-size: 0.9375rem;
       font-weight: 600;
@@ -134,16 +160,59 @@
       letter-spacing: -0.01em;
     }
 
-    .btn-primary:hover { background: #1d3a8a; transform: translateY(-1px); }
+    .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
 
     .btn-ghost {
-      color: #475569;
+      color: rgba(255, 255, 255, 0.75);
       font-size: 0.9rem;
       font-weight: 500;
       text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 12px 24px;
+      border-radius: 8px;
+      transition: background 0.15s, color 0.15s;
     }
 
-    .btn-ghost:hover { color: #0f172a; }
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    /* Hero stat badges */
+    .hero-badges {
+      display: flex;
+      gap: 20px;
+      margin-top: 56px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .badge-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .badge-label {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-divider {
+      width: 1px;
+      background: rgba(255, 255, 255, 0.2);
+      align-self: stretch;
+      margin: 0 4px;
+    }
 
     /* ── Demos ──────────────────────────────────────────────────────────────── */
     .demos {
@@ -322,7 +391,9 @@
     .footer-links a:hover { color: #64748b; }
 
     @media (max-width: 600px) {
+      .hero { min-height: 100svh; }
       .hero-actions { flex-direction: column; align-items: flex-start; }
+      .hero-badges { gap: 16px; margin-top: 40px; }
       .footer-inner { flex-direction: column; }
     }
   </style>
@@ -336,13 +407,32 @@
     </div>
   </nav>
 
-  <section class="hero">
-    <div class="hero-eyebrow">AI Chat Demo Platform</div>
-    <h1>Conversational AI that <em>works for your clients</em></h1>
-    <p>Sector-specific chatbots powered by Claude. Trained on your knowledge base, embedded on any site in minutes.</p>
-    <div class="hero-actions">
-      <a href="/login" class="btn-primary">View live demos →</a>
-      <a href="/login" class="btn-ghost">Sign in to the platform</a>
+  <section class="hero" aria-label="Hero — AI-powered chat solutions for every sector">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Demo Staging Environment</div>
+      <h1>Conversational AI that <em>works for your clients</em></h1>
+      <p>A private staging environment for live chatbot demos across retail, legal, and public sector. Select a demo below to explore.</p>
+      <div class="hero-actions">
+        <a href="/login" class="btn-primary">View live demos →</a>
+        <a href="/login" class="btn-ghost">Sign in to the platform</a>
+      </div>
+      <div class="hero-badges">
+        <div class="hero-badge">
+          <span class="badge-value">3</span>
+          <span class="badge-label">Sector demos live</span>
+        </div>
+        <div class="badge-divider"></div>
+        <div class="hero-badge">
+          <span class="badge-value">Private</span>
+          <span class="badge-label">Staging access only</span>
+        </div>
+        <div class="badge-divider"></div>
+        <div class="hero-badge">
+          <span class="badge-value">&lt;5 min</span>
+          <span class="badge-label">To embed on any site</span>
+        </div>
+      </div>
     </div>
   </section>
 
